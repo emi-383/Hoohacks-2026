@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Music — Cloud Café</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet"/>
+  <!-- style.css owns ALL color variables — edit colors there only -->
+  <link rel="stylesheet" href="/static/css/style.css"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { min-height: 100vh; background-color: var(--cream); background-image: radial-gradient(ellipse at 15% 15%, var(--gradient-a) 0%, transparent 55%), radial-gradient(ellipse at 85% 85%, var(--gradient-b) 0%, transparent 55%); font-family: 'Lora', serif; color: var(--ink); }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; background: var(--paper); border-bottom: 2px dashed var(--brown-pale); box-shadow: 0 2px 12px var(--shadow); }
+    .back-btn { font-family: 'Caveat', cursive; font-size: 1.1rem; color: var(--brown); text-decoration: none; transition: color 0.2s; }
+    .back-btn:hover { color: var(--brown-light); }
+    .topbar-title { font-family: 'Caveat', cursive; font-size: 2rem; font-weight: 700; color: var(--brown); }
+    .nav-link { font-family: 'Caveat', cursive; font-size: 1rem; padding: 0.45rem 1.1rem; border-radius: 20px; text-decoration: none; background: var(--sage); color: var(--ink); transition: background 0.2s, transform 0.1s; }
+    .nav-link:hover { background: var(--sage-dark); color: var(--cream); transform: translateY(-1px); }
+    .container { max-width: 620px; margin: 2.5rem auto; padding: 0 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; align-items: center; }
+    .art-placeholder { width: 100%; height: 80px; border: 1.5px dashed var(--brown-pale); border-radius: 10px; background: var(--cream); }
+    .card { width: 100%; background: var(--paper); border: 2px solid var(--brown-pale); border-radius: 14px; padding: 1.5rem; box-shadow: 0 2px 16px var(--shadow); }
+    .card-title { font-family: 'Caveat', cursive; font-size: 1.3rem; color: var(--brown); display: block; margin-bottom: 0.3rem; }
+    .card-sub { font-family: 'Lora', serif; font-style: italic; font-size: 0.88rem; color: var(--ink-light); display: block; margin-bottom: 1.2rem; }
+    .embed-wrap { border-radius: 12px; overflow: hidden; box-shadow: 0 4px 14px var(--shadow); }
+    #spotify-embed { width: 100%; height: 380px; border: none; border-radius: 12px; display: block; }
+    .spotify-credit { font-family: 'Lora', serif; font-style: italic; font-size: 0.78rem; color: var(--ink-light); text-align: right; margin-top: 0.6rem; display: block; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="/" class="back-btn">← back to café</a>
+    <span class="topbar-title">☕ music</span>
+    <a href="/journal" class="nav-link">open journal</a>
+  </div>
+  <div class="container">
+    <div class="art-placeholder"></div>
+    <!-- <img class="page-art" src="/static/img/music-art.png" alt="music"/> -->
+    <div class="card">
+      <span class="card-title">something to listen to</span>
+      <span class="card-sub">sit back, put on some music, take a breath</span>
+      <!--
+        TO CHANGE THE PLAYLIST:
+        Replace the playlist ID in the src below.
+        Find it from any Spotify share link — the part after /playlist/
+
+        Current: Peaceful Piano by Spotify
+        Other calm options:
+          37i9dQZF1DWZqd5JICZI0u  — Deep Focus
+          37i9dQZF1DWZd79rJ6a7lp  — Sleep
+      -->
+      <div class="embed-wrap">
+        <iframe id="spotify-embed"
+          src="https://open.spotify.com/embed/playlist/37i9dQZF1DX3Ogo9pFvBkY?utm_source=generator&theme=1"
+          allowtransparency="true"
+          allow="encrypted-media; autoplay; clipboard-write"
+          loading="lazy">
+        </iframe>
+      </div>
+      <span class="spotify-credit">powered by Spotify</span>
+    </div>
+  </div>
+</body>
+</html>

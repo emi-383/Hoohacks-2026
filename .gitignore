@@ -1,0 +1,15 @@
+# Secret API keys
+.env
+
+# Virtual Environment
+.venv/
+venv/
+env/
+bin/
+lib/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+database.db

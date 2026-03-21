@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cloud Café</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet"/>
+  <!-- style.css owns ALL color variables — edit colors there only -->
+  <link rel="stylesheet" href="/static/css/style.css"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 100vw; height: 100vh; overflow: hidden;
+      background: var(--cream);
+      font-family: 'Lora', serif;
+    }
+
+    /* loading screen */
+    #loading-screen {
+      position: fixed; inset: 0; background: var(--cream);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1.2rem; z-index: 1000; transition: opacity 0.8s ease;
+    }
+    #loading-screen.fade-out { opacity: 0; pointer-events: none; }
+
+    .loading-title {
+      font-family: 'Caveat', cursive; font-size: 3.2rem;
+      font-weight: 700; color: var(--brown); letter-spacing: 0.04em;
+    }
+    .loading-sub {
+      font-family: 'Lora', serif; font-style: italic;
+      font-size: 1rem; color: var(--ink-light);
+    }
+    .loading-dots { display: flex; gap: 0.5rem; margin-top: 0.4rem; }
+    .dot {
+      width: 8px; height: 8px; background: var(--brown-pale);
+      border-radius: 50%; animation: bounce 1.2s ease-in-out infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.35; }
+      40% { transform: translateY(-9px); opacity: 1; }
+    }
+
+    /* café scene */
+    #cafe-scene {
+      position: relative; width: 100vw; height: 100vh;
+      opacity: 0; transition: opacity 0.8s ease 0.3s;
+    }
+    #cafe-scene.visible { opacity: 1; }
+
+    /* title bar */
+    .title-bar {
+      position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+      padding: 0.9rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(to bottom, rgba(255,240,240,0.88) 0%, rgba(255,240,240,0) 100%);
+    }
+    .title-bar-name {
+      font-family: 'Caveat', cursive; font-size: 1.9rem;
+      font-weight: 700; color: var(--brown); letter-spacing: 0.04em;
+    }
+    .title-bar-tag {
+      font-family: 'Lora', serif; font-style: italic;
+      font-size: 0.85rem; color: var(--ink-light);
+    }
+
+    /* coin counter */
+    .coin-counter {
+      font-family: 'Caveat', cursive; font-size: 1rem;
+      color: var(--brown); background: var(--paper);
+      border: 1.5px solid var(--brown-pale); border-radius: 20px;
+      padding: 0.3rem 0.9rem; text-decoration: none;
+      box-shadow: 0 2px 8px var(--shadow); transition: background 0.2s;
+    }
+    .coin-counter:hover { background: var(--brown-pale); }
+    .coin-counter.flash { animation: coinFlash 0.6s ease; }
+    @keyframes coinFlash {
+      0%, 100% { background: var(--paper); }
+      50% { background: var(--blush); }
+    }
+
+    /* background placeholder — remove when art is ready */
+    .bg-placeholder {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, #ffe8ec 0%, #ffd6dc 48%, #f5a8b8 48%, #e8849a 100%);
+    }
+    .bg-placeholder::before {
+      content: ''; position: absolute; top: 9%; left: 50%; transform: translateX(-50%);
+      width: 200px; height: 155px; border: 5px solid #e8849a; border-radius: 3px;
+      background: linear-gradient(150deg, #fce4ec 0%, #fff0f4 100%);
+    }
+    .bg-placeholder::after {
+      content: ''; position: absolute; top: 33%; left: 12%;
+      width: 26%; height: 7px; background: #e8849a; border-radius: 3px;
+    }
+    /* uncomment when art is ready:
+    .cafe-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; } */
+
+    /* cat placeholder — remove when art is ready */
+    .cat-area {
+      position: absolute; bottom: 0; left: 5%; z-index: 20;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .cat-wrap {
+      position: relative; display: flex; flex-direction: column;
+      align-items: center; cursor: pointer; transition: transform 0.2s;
+    }
+    .cat-wrap:hover { transform: translateY(-5px); }
+    .cat-body {
+      width: 88px; height: 108px; background: var(--brown-pale);
+      border-radius: 50% 50% 42% 42%; position: relative;
+      box-shadow: 0 4px 14px var(--shadow);
+    }
+    .cat-body::before, .cat-body::after {
+      content: ''; position: absolute; top: -17px; width: 0; height: 0;
+      border-left: 12px solid transparent; border-right: 12px solid transparent;
+      border-bottom: 20px solid var(--brown-pale);
+    }
+    .cat-body::before { left: 10px; }
+    .cat-body::after  { right: 10px; }
+    .cat-eye { position: absolute; top: 30px; width: 10px; height: 10px; background: var(--brown); border-radius: 50%; }
+    .cat-eye.l { left: 18px; } .cat-eye.r { right: 18px; }
+    .cat-nose { position: absolute; top: 48px; left: 50%; transform: translateX(-50%); width: 6px; height: 5px; background: var(--brown-light); border-radius: 50%; }
+    .cat-label { font-family: 'Caveat', cursive; font-size: 0.85rem; color: var(--ink-light); margin-top: 0.3rem; }
+    /* uncomment when art is ready:
+    #cat-img { position:absolute; bottom:0; left:5%; height:45%; cursor:pointer; z-index:20; transition:transform 0.2s; }
+    #cat-img:hover { transform: translateY(-5px); } */
+
+    /* outfit layers */
+    #outfit-layers {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
+    }
+    #outfit-layers img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
+
+    /* chat bubble */
+    #chat-bubble {
+      position: absolute; bottom: 148px; left: calc(5% + 8px);
+      background: var(--paper); border: 2px solid var(--brown-pale);
+      border-radius: 16px 16px 16px 4px; padding: 0.5rem 1rem;
+      font-family: 'Caveat', cursive; font-size: 0.95rem; color: var(--brown);
+      box-shadow: 0 3px 12px var(--shadow); cursor: pointer; z-index: 21;
+      max-width: 210px; line-height: 1.4; animation: float 3s ease-in-out infinite;
+    }
+    #chat-bubble:hover { background: var(--cream); }
+    #chat-bubble::after {
+      content: ''; position: absolute; bottom: -10px; left: 14px;
+      width: 0; height: 0;
+      border-left: 8px solid transparent; border-right: 8px solid transparent;
+      border-top: 10px solid var(--brown-pale);
+    }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    #bubble-dot {
+      position: absolute; top: -5px; right: -5px; width: 11px; height: 11px;
+      background: var(--brown); border-radius: 50%; border: 2px solid var(--paper); display: none;
+    }
+    #bubble-dot.show { display: block; }
+
+    /* chat panel */
+    #chat-panel {
+      position: absolute; bottom: 138px; left: calc(5% + 8px);
+      width: 340px; display: none; flex-direction: column;
+      background: var(--paper); border: 2px solid var(--brown-pale);
+      border-radius: 16px 16px 16px 4px; box-shadow: 0 8px 32px var(--shadow);
+      overflow: hidden; z-index: 30; animation: panelUp 0.25s ease;
+    }
+    #chat-panel.open { display: flex; }
+    @keyframes panelUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .chat-header { display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 1rem; background: var(--brown); }
+    .chat-header-name { font-family: 'Caveat', cursive; font-size: 1.1rem; font-weight: 700; color: var(--cream); }
+    .chat-header-sub { font-family: 'Lora', serif; font-size: 0.68rem; font-style: italic; color: var(--blush); margin-top: 1px; }
+    .chat-close { background: none; border: none; color: var(--cream); font-family: 'Caveat', cursive; font-size: 1rem; cursor: pointer; opacity: 0.7; transition: opacity 0.15s; }
+    .chat-close:hover { opacity: 1; }
+
+    #chat-window { height: 300px; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.6rem; background: var(--cream); }
+
+    .input-area { display: flex; padding: 0.6rem; background: var(--paper); border-top: 1.5px solid var(--brown-pale); gap: 0.4rem; }
+    #user-input { flex: 1; border: 1.5px solid var(--brown-pale); border-radius: 10px; padding: 0.45rem 0.8rem; font-family: 'Caveat', cursive; font-size: 1rem; color: var(--ink); outline: none; background: var(--cream); transition: border-color 0.2s; }
+    #user-input:focus { border-color: var(--brown); }
+    #user-input::placeholder { color: var(--ink-light); font-style: italic; }
+    .send-btn { font-family: 'Caveat', cursive; font-size: 1rem; padding: 0.45rem 1rem; background: var(--brown); color: var(--cream); border: none; border-radius: 10px; cursor: pointer; transition: background 0.2s; }
+    .send-btn:hover { background: var(--brown-light); }
+
+    /* menu panel placeholder */
+    .menu-placeholder {
+      position: absolute; top: 5%; right: 2%; width: 160px; height: 88%;
+      background: var(--paper); border: 2px solid var(--brown-pale); border-radius: 12px;
+      box-shadow: 0 4px 20px var(--shadow); display: flex; flex-direction: column;
+      align-items: center; padding: 1rem 0.6rem; gap: 0.1rem; z-index: 10;
+    }
+    .menu-title { font-family: 'Caveat', cursive; font-size: 1.2rem; font-weight: 700; color: var(--brown); margin-bottom: 0.4rem; }
+    .menu-divider { width: 60%; height: 1.5px; background: var(--brown-pale); border-radius: 2px; margin: 0.15rem 0; }
+    .menu-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; width: 100%; padding: 0.5rem 0.4rem; border-radius: 10px; transition: background 0.15s, transform 0.15s; flex: 1; justify-content: center; }
+    .menu-item:hover { background: var(--cream); transform: scale(1.03); }
+    .menu-item-art { width: 46px; height: 46px; border: 1.5px dashed var(--brown-pale); border-radius: 8px; background: var(--cream); margin-bottom: 0.3rem; object-fit: contain; }
+    .menu-item-name { font-family: 'Caveat', cursive; font-size: 0.95rem; color: var(--brown); font-weight: 600; }
+    .menu-item-desc { font-family: 'Lora', serif; font-size: 0.65rem; color: var(--ink-light); font-style: italic; text-align: center; }
+
+    /* coin toast */
+    .coin-toast {
+      position: fixed; bottom: 2rem; right: 2rem; background: var(--brown); color: var(--cream);
+      font-family: 'Caveat', cursive; font-size: 1.05rem; padding: 0.7rem 1.4rem;
+      border-radius: 20px; box-shadow: 0 4px 16px var(--shadow); opacity: 0;
+      transform: translateY(8px); transition: all 0.3s; pointer-events: none; z-index: 100;
+    }
+    .coin-toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+  <div id="loading-screen">
+    <span class="loading-title">☕ Cloud Café</span>
+    <span class="loading-sub">brewing something warm for you...</span>
+    <div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  </div>
+
+  <div id="cafe-scene">
+    <div class="title-bar">
+      <span class="title-bar-name">☕ Cloud Café</span>
+      <a href="/closet" class="coin-counter" id="coin-display">0 coins</a>
+      <span class="title-bar-tag">a quiet place for you</span>
+    </div>
+
+    <div class="bg-placeholder"></div>
+    <!-- <img class="cafe-bg" src="/static/img/cafe-background.png" alt="Cloud Café"/> -->
+
+    <div class="cat-area">
+      <div class="cat-wrap" onclick="toggleChat()">
+        <div class="cat-body">
+          <div class="cat-eye l"></div><div class="cat-eye r"></div><div class="cat-nose"></div>
+          <div id="outfit-layers"></div>
+        </div>
+      </div>
+      <span class="cat-label">Mochi</span>
+    </div>
+    <!-- <img id="cat-img" src="/static/img/cat-idle.png" alt="Mochi" onclick="toggleChat()"/> -->
+
+    <div id="chat-bubble" onclick="toggleChat()">
+      <span id="bubble-text">welcome in</span>
+      <div id="bubble-dot"></div>
+    </div>
+
+    <div id="chat-panel">
+      <div class="chat-header">
+        <div><div class="chat-header-name">Mochi</div><div class="chat-header-sub">Cloud Café host</div></div>
+        <button class="chat-close" onclick="toggleChat()">close</button>
+      </div>
+      <div id="chat-window"></div>
+      <div class="input-area">
+        <input type="text" id="user-input" placeholder="say something..." onkeypress="handleKeyPress(event)"/>
+        <button class="send-btn" onclick="sendMessage()">send</button>
+      </div>
+    </div>
+
+    <div class="menu-placeholder">
+      <span class="menu-title">menu</span>
+      <div class="menu-divider"></div>
+      <a href="/journal" class="menu-item"><div class="menu-item-art"></div><span class="menu-item-name">journal</span><span class="menu-item-desc">write it out</span></a>
+      <div class="menu-divider"></div>
+      <a href="/mood" class="menu-item"><div class="menu-item-art"></div><span class="menu-item-name">mood</span><span class="menu-item-desc">track how you feel</span></a>
+      <div class="menu-divider"></div>
+      <a href="/music" class="menu-item"><div class="menu-item-art"></div><span class="menu-item-name">music</span><span class="menu-item-desc">something to listen to</span></a>
+      <div class="menu-divider"></div>
+      <a href="/fortune" class="menu-item"><div class="menu-item-art"></div><span class="menu-item-name">fortune</span><span class="menu-item-desc">a message for today</span></a>
+      <div class="menu-divider"></div>
+      <a href="/closet" class="menu-item"><div class="menu-item-art"></div><span class="menu-item-name">closet</span><span class="menu-item-desc">dress up Mochi</span></a>
+      <div class="menu-divider"></div>
+      <a href="/breathing" class="menu-item"><div class="menu-item-art"></div><span class="menu-item-name">breathe</span><span class="menu-item-desc">take a moment</span></a>
+    </div>
+
+  </div>
+
+  <div class="coin-toast" id="coin-toast"></div>
+  <script src="/static/js/chat.js"></script>
+  <script>
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('loading-screen').classList.add('fade-out');
+        document.getElementById('cafe-scene').classList.add('visible');
+        setTimeout(() => {
+          const greetings = ["welcome to Cloud Café. i'm Mochi.", "glad you're here. the menu is on the wall.", "come in, take a seat. what's on your mind?"];
+          const msg = greetings[Math.floor(Math.random() * greetings.length)];
+          document.getElementById('bubble-text').textContent = msg;
+          document.getElementById('bubble-dot').classList.add('show');
+          appendMessage('bot', msg);
+        }, 700);
+        claimLoginReward();
+        loadOutfits();
+      }, 2000);
+    });
+
+    async function claimLoginReward() {
+      try {
+        const res = await fetch('/api/login-reward', { method: 'POST' });
+        const data = await res.json();
+        updateCoinDisplay(data.coins);
+        if (data.rewarded) showCoinToast('daily coin earned');
+      } catch {}
+    }
+
+    function updateCoinDisplay(coins) {
+      const el = document.getElementById('coin-display');
+      el.textContent = `${coins} coin${coins !== 1 ? 's' : ''}`;
+      el.classList.add('flash');
+      setTimeout(() => el.classList.remove('flash'), 700);
+    }
+
+    async function loadOutfits() {
+      try {
+        const res = await fetch('/api/wardrobe/equipped');
+        const data = await res.json();
+        const layer = document.getElementById('outfit-layers');
+        layer.innerHTML = '';
+        data.equipped.forEach(slug => {
+          const img = document.createElement('img');
+          img.src = `/static/img/outfits/outfit-${slug}.png`;
+          img.onerror = () => img.style.display = 'none';
+          layer.appendChild(img);
+        });
+      } catch {}
+    }
+
+    function toggleChat() {
+      const panel = document.getElementById('chat-panel');
+      const bubble = document.getElementById('chat-bubble');
+      const dot = document.getElementById('bubble-dot');
+      const isOpen = panel.classList.contains('open');
+      if (isOpen) { panel.classList.remove('open'); bubble.style.display = 'block'; }
+      else { panel.classList.add('open'); bubble.style.display = 'none'; dot.classList.remove('show'); setTimeout(() => document.getElementById('user-input').focus(), 60); }
+    }
+
+    function onBotMessage(text) {
+      const panel = document.getElementById('chat-panel');
+      if (!panel.classList.contains('open')) {
+        document.getElementById('bubble-text').textContent = text.length > 55 ? text.slice(0, 52) + '...' : text;
+        document.getElementById('bubble-dot').classList.add('show');
+      }
+    }
+
+    function showCoinToast(msg) {
+      const t = document.getElementById('coin-toast');
+      t.textContent = msg; t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+  </script>
+</body>
+</html>

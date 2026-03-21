@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mood — Cloud Café</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet"/>
+  <!-- style.css owns ALL color variables — edit colors there only -->
+  <link rel="stylesheet" href="/static/css/style.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { min-height: 100vh; background-color: var(--cream); background-image: radial-gradient(ellipse at 20% 10%, var(--gradient-a) 0%, transparent 50%), radial-gradient(ellipse at 80% 90%, var(--gradient-b) 0%, transparent 55%); font-family: 'Lora', serif; color: var(--ink); }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; background: var(--paper); border-bottom: 2px dashed var(--brown-pale); box-shadow: 0 2px 12px var(--shadow); }
+    .back-btn { font-family: 'Caveat', cursive; font-size: 1.1rem; color: var(--brown); text-decoration: none; transition: color 0.2s; }
+    .back-btn:hover { color: var(--brown-light); }
+    .topbar-title { font-family: 'Caveat', cursive; font-size: 2rem; font-weight: 700; color: var(--brown); }
+    .topbar-right { display: flex; align-items: center; gap: 0.8rem; }
+    .coin-badge { font-family: 'Caveat', cursive; font-size: 0.95rem; color: var(--brown); background: var(--brown-pale); padding: 0.3rem 0.8rem; border-radius: 20px; text-decoration: none; transition: background 0.2s; }
+    .coin-badge:hover { background: var(--blush); }
+    .nav-link { font-family: 'Caveat', cursive; font-size: 1rem; padding: 0.45rem 1.1rem; border-radius: 20px; text-decoration: none; background: var(--sage); color: var(--ink); transition: background 0.2s, transform 0.1s; }
+    .nav-link:hover { background: var(--sage-dark); color: var(--cream); transform: translateY(-1px); }
+    .container { max-width: 860px; margin: 2rem auto; padding: 0 1.5rem; display: flex; flex-direction: column; gap: 1.8rem; }
+    .card { background: var(--paper); border: 2px solid var(--brown-pale); border-radius: 14px; padding: 1.5rem; box-shadow: 0 2px 16px var(--shadow); animation: fadeUp 0.3s ease; }
+    .card-title { font-family: 'Caveat', cursive; font-size: 1.3rem; color: var(--brown); margin-bottom: 1.2rem; display: block; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+    .mood-pills { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1rem; }
+    .mood-pill { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.9rem 0.4rem 0.5rem; border-radius: 20px; border: 2px solid var(--brown-pale); background: var(--cream); cursor: pointer; transition: all 0.15s; font-family: 'Caveat', cursive; font-size: 1rem; color: var(--ink-light); }
+    .mood-pill:hover { border-color: var(--brown-light); transform: translateY(-2px); }
+    .mood-pill.selected { border-color: var(--brown); color: var(--brown); font-weight: 700; transform: translateY(-2px); background: var(--blush); }
+    .pill-art { width: 26px; height: 26px; border-radius: 50%; border: 1.5px dashed var(--brown-pale); background: var(--cream); flex-shrink: 0; object-fit: contain; display: block; }
+    .free-mood-row { display: flex; gap: 0.6rem; align-items: center; margin-bottom: 1rem; }
+    .free-mood-input { flex: 1; font-family: 'Caveat', cursive; font-size: 1rem; padding: 0.5rem 1rem; border: 2px solid var(--brown-pale); border-radius: 20px; background: var(--cream); color: var(--ink); outline: none; transition: border-color 0.2s; }
+    .free-mood-input:focus { border-color: var(--brown); }
+    .free-mood-input::placeholder { color: var(--ink-light); font-style: italic; }
+    .free-mood-btn { font-family: 'Caveat', cursive; font-size: 1rem; padding: 0.5rem 1.1rem; border-radius: 20px; border: 2px solid var(--brown-pale); background: transparent; color: var(--brown); cursor: pointer; transition: all 0.15s; }
+    .free-mood-btn:hover { background: var(--brown-pale); }
+    .note-wrap { position: relative; margin-bottom: 1rem; }
+    .paper-lines { position: absolute; inset: 0; pointer-events: none; background-image: repeating-linear-gradient(transparent, transparent 31px, var(--brown-pale) 31px, var(--brown-pale) 32px); border-radius: 8px; }
+    textarea { position: relative; z-index: 1; width: 100%; min-height: 72px; padding: 8px 1rem 1rem; background: transparent; border: 2px solid var(--brown-pale); border-radius: 8px; font-family: 'Caveat', cursive; font-size: 1.05rem; line-height: 32px; color: var(--ink); resize: vertical; outline: none; transition: border-color 0.2s; }
+    textarea:focus { border-color: var(--brown); }
+    textarea::placeholder { color: var(--ink-light); font-style: italic; }
+    .log-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.6rem; }
+    .selected-label { font-family: 'Caveat', cursive; font-size: 1rem; color: var(--ink-light); }
+    .selected-label strong { color: var(--brown); }
+    .save-btn { font-family: 'Caveat', cursive; font-size: 1.15rem; font-weight: 700; padding: 0.55rem 1.8rem; background: var(--brown); color: var(--cream); border: none; border-radius: 20px; cursor: pointer; transition: all 0.2s; box-shadow: 0 3px 10px var(--shadow); }
+    .save-btn:hover { background: var(--brown-light); transform: translateY(-2px); }
+    .streak-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .streak-stat { flex: 1; min-width: 130px; background: var(--cream); border: 1.5px solid var(--brown-pale); border-radius: 12px; padding: 1.2rem; text-align: center; }
+    .streak-number { font-family: 'Caveat', cursive; font-size: 2.8rem; font-weight: 700; color: var(--brown); line-height: 1; display: block; }
+    .streak-desc { font-family: 'Caveat', cursive; font-size: 0.95rem; color: var(--ink-light); margin-top: 0.3rem; display: block; }
+    .chart-wrap { position: relative; height: 240px; }
+    .calendar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem; }
+    .cal-month-label { font-family: 'Caveat', cursive; font-size: 0.95rem; color: var(--ink-light); }
+    .cal-dow { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; margin-bottom: 4px; }
+    .cal-dow-label { font-family: 'Caveat', cursive; font-size: 0.8rem; color: var(--ink-light); text-align: center; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
+    .cal-day { aspect-ratio: 1; border-radius: 6px; background: var(--brown-pale); opacity: 0.25; position: relative; transition: transform 0.15s; }
+    .cal-day.has-mood { opacity: 1; }
+    .cal-day.has-mood:hover { transform: scale(1.2); z-index: 2; }
+    .cal-day.today { outline: 2px solid var(--brown); outline-offset: 1px; opacity: 1; }
+    .cal-day[data-tip]:hover::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: var(--brown); color: var(--cream); font-family: 'Caveat', cursive; font-size: 0.85rem; padding: 0.2rem 0.6rem; border-radius: 8px; white-space: nowrap; pointer-events: none; z-index: 10; }
+    .mood-happy { background: var(--c-happy) !important; } .mood-calm { background: var(--c-calm) !important; } .mood-content { background: var(--c-content) !important; } .mood-hopeful { background: var(--c-hopeful) !important; } .mood-anxious { background: var(--c-anxious) !important; } .mood-frustrated { background: var(--c-frustrated) !important; } .mood-lonely { background: var(--c-lonely) !important; } .mood-sad { background: var(--c-sad) !important; } .mood-tired { background: var(--c-tired) !important; } .mood-custom { background: var(--blush) !important; }
+    .legend { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1rem; }
+    .legend-item { display: flex; align-items: center; gap: 0.35rem; font-family: 'Caveat', cursive; font-size: 0.9rem; color: var(--ink-light); }
+    .legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+    .empty-state { text-align: center; padding: 2rem; font-family: 'Caveat', cursive; font-size: 1.1rem; color: var(--ink-light); }
+    .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--brown); color: var(--cream); font-family: 'Caveat', cursive; font-size: 1.05rem; padding: 0.7rem 1.4rem; border-radius: 20px; box-shadow: 0 4px 16px var(--shadow); opacity: 0; transform: translateY(8px); transition: all 0.3s; pointer-events: none; z-index: 100; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="/" class="back-btn">← back to café</a>
+    <span class="topbar-title">☕ mood tracker</span>
+    <div class="topbar-right">
+      <a href="/closet" class="coin-badge" id="coin-badge">— coins</a>
+      <a href="/journal" class="nav-link">open journal</a>
+    </div>
+  </div>
+  <div class="container">
+    <div class="card">
+      <span class="card-title">how are you feeling right now?</span>
+      <div class="mood-pills">
+        <button class="mood-pill" data-mood="happy"      onclick="selectMood(this)"><div class="pill-art"></div>happy</button>
+        <button class="mood-pill" data-mood="calm"       onclick="selectMood(this)"><div class="pill-art"></div>calm</button>
+        <button class="mood-pill" data-mood="content"    onclick="selectMood(this)"><div class="pill-art"></div>content</button>
+        <button class="mood-pill" data-mood="hopeful"    onclick="selectMood(this)"><div class="pill-art"></div>hopeful</button>
+        <button class="mood-pill" data-mood="anxious"    onclick="selectMood(this)"><div class="pill-art"></div>anxious</button>
+        <button class="mood-pill" data-mood="frustrated" onclick="selectMood(this)"><div class="pill-art"></div>frustrated</button>
+        <button class="mood-pill" data-mood="lonely"     onclick="selectMood(this)"><div class="pill-art"></div>lonely</button>
+        <button class="mood-pill" data-mood="sad"        onclick="selectMood(this)"><div class="pill-art"></div>sad</button>
+        <button class="mood-pill" data-mood="tired"      onclick="selectMood(this)"><div class="pill-art"></div>tired</button>
+      </div>
+      <div class="free-mood-row">
+        <input type="text" class="free-mood-input" id="free-mood-input" placeholder="or type your own..." oninput="onFreeType()" maxlength="30"/>
+        <button class="free-mood-btn" onclick="confirmFreeMood()">use this</button>
+      </div>
+      <div class="note-wrap"><div class="paper-lines"></div><textarea id="mood-note" placeholder="anything on your mind? (optional)" rows="2"></textarea></div>
+      <div class="log-row">
+        <span class="selected-label" id="selected-label">nothing selected</span>
+        <button class="save-btn" onclick="saveMood()">log mood</button>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-title">your streak</span>
+      <div class="streak-row">
+        <div class="streak-stat"><span class="streak-number" id="streak-count">—</span><span class="streak-desc">day streak</span></div>
+        <div class="streak-stat"><span class="streak-number" id="total-count">—</span><span class="streak-desc">total check-ins</span></div>
+        <div class="streak-stat"><span class="streak-number" id="unique-count">—</span><span class="streak-desc">moods explored</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-title">mood frequency</span>
+      <div class="chart-wrap"><canvas id="mood-chart"></canvas></div>
+      <div id="chart-empty" class="empty-state" style="display:none">no moods logged yet</div>
+    </div>
+    <div class="card">
+      <div class="calendar-header"><span class="card-title" style="margin-bottom:0">calendar</span><span class="cal-month-label">last 5 weeks</span></div>
+      <div class="cal-dow"><span class="cal-dow-label">sun</span><span class="cal-dow-label">mon</span><span class="cal-dow-label">tue</span><span class="cal-dow-label">wed</span><span class="cal-dow-label">thu</span><span class="cal-dow-label">fri</span><span class="cal-dow-label">sat</span></div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="legend" id="cal-legend"></div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+<script>
+  const MOOD_COLORS = { happy:'#f9d56e', calm:'#b8e0c8', content:'#b8d9b5', hopeful:'#f7e08a', anxious:'#f4a36c', frustrated:'#e89090', lonely:'#b8cce4', sad:'#a8c4e8', tired:'#d4b8e0' };
+  const CUSTOM_COLOR = '#f9a8b4';
+  const moodColor = m => MOOD_COLORS[m] || CUSTOM_COLOR;
+  const moodClass = m => MOOD_COLORS[m] ? `mood-${m}` : 'mood-custom';
+  let selectedMood = null, chartInstance = null;
+  async function loadCoins() { try { const res = await fetch('/api/coins'); const data = await res.json(); document.getElementById('coin-badge').textContent = `${data.coins} coin${data.coins!==1?'s':''}`; } catch {} }
+  loadCoins();
+  function selectMood(pill) { document.querySelectorAll('.mood-pill').forEach(p=>p.classList.remove('selected')); pill.classList.add('selected'); selectedMood = pill.dataset.mood; document.getElementById('free-mood-input').value = ''; updateSelectedLabel(); }
+  function onFreeType() { if (document.getElementById('free-mood-input').value.trim()) { document.querySelectorAll('.mood-pill').forEach(p=>p.classList.remove('selected')); selectedMood = null; } updateSelectedLabel(); }
+  function confirmFreeMood() { const val = document.getElementById('free-mood-input').value.trim().toLowerCase(); if (!val) { showToast('type a mood first'); return; } document.querySelectorAll('.mood-pill').forEach(p=>p.classList.remove('selected')); selectedMood = val; updateSelectedLabel(); showToast(`"${val}" selected`); }
+  function updateSelectedLabel() { const freeVal = document.getElementById('free-mood-input').value.trim().toLowerCase(); const active = selectedMood || freeVal || null; document.getElementById('selected-label').innerHTML = active ? `feeling <strong>${active}</strong>` : 'nothing selected'; }
+  async function saveMood() {
+    const freeVal = document.getElementById('free-mood-input').value.trim().toLowerCase();
+    const mood = selectedMood || freeVal;
+    if (!mood) { showToast('pick or type a mood first'); return; }
+    const note = document.getElementById('mood-note').value.trim();
+    try {
+      const res = await fetch('/api/mood/save', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({mood,note}) });
+      if (!res.ok) throw new Error();
+      document.querySelectorAll('.mood-pill').forEach(p=>p.classList.remove('selected'));
+      document.getElementById('free-mood-input').value = ''; document.getElementById('mood-note').value = '';
+      selectedMood = null; updateSelectedLabel();
+      showToast('mood logged — coin earned'); loadCoins(); loadStats();
+    } catch { showToast('something went wrong, try again'); }
+  }
+  async function loadStats() {
+    try {
+      const res = await fetch('/api/mood/history'); const data = await res.json();
+      if (data.length===0) { setStreakStats(0,0,0); clearChart(); buildCalendar({}); return; }
+      const dayMap = {}, freqMap = {};
+      data.forEach(e => { const day = e.date.split('T')[0].split(' ')[0]; dayMap[day] = e.mood.toLowerCase(); const m = e.mood.toLowerCase(); freqMap[m] = (freqMap[m]||0)+1; });
+      setStreakStats(calcStreak(dayMap), data.length, Object.keys(freqMap).length);
+      renderChart(freqMap); buildCalendar(dayMap);
+    } catch(e) { console.error(e); }
+  }
+  function calcStreak(dayMap) { let s=0; const today=new Date(); for(let i=0;i<365;i++){const d=new Date(today);d.setDate(today.getDate()-i);if(dayMap[d.toISOString().split('T')[0]])s++;else break;} return s; }
+  function setStreakStats(s,t,u) { document.getElementById('streak-count').textContent=s; document.getElementById('total-count').textContent=t; document.getElementById('unique-count').textContent=u; }
+  function renderChart(freqMap) {
+    const labels=Object.keys(freqMap), values=Object.values(freqMap), colors=labels.map(moodColor);
+    document.getElementById('chart-empty').style.display = labels.length===0?'block':'none';
+    if(chartInstance) chartInstance.destroy();
+    chartInstance = new Chart(document.getElementById('mood-chart').getContext('2d'),{type:'bar',data:{labels,datasets:[{data:values,backgroundColor:colors,borderColor:colors.map(c=>c+'bb'),borderWidth:1.5,borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.parsed.y} time${ctx.parsed.y!==1?'s':''}`},bodyFont:{family:'Caveat',size:14},titleFont:{family:'Caveat',size:14}}},scales:{x:{ticks:{font:{family:'Caveat',size:13},color:'var(--ink-light)'},grid:{display:false}},y:{ticks:{font:{family:'Caveat',size:12},color:'var(--ink-light)',stepSize:1},grid:{color:'var(--brown-pale)'},beginAtZero:true}}}});
+  }
+  function clearChart() { if(chartInstance) chartInstance.destroy(); document.getElementById('chart-empty').style.display='block'; }
+  function buildCalendar(dayMap) {
+    const grid=document.getElementById('cal-grid'), legend=document.getElementById('cal-legend');
+    grid.innerHTML=''; legend.innerHTML='';
+    const today=new Date(), todayKey=today.toISOString().split('T')[0];
+    const start=new Date(today); start.setDate(today.getDate()-34); start.setDate(start.getDate()-start.getDay());
+    const moodsInRange=new Set();
+    for(let i=0;i<35;i++){const d=new Date(start);d.setDate(start.getDate()+i);const key=d.toISOString().split('T')[0];const mood=dayMap[key];const label=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});const sq=document.createElement('div');sq.className='cal-day';if(mood){sq.classList.add('has-mood',moodClass(mood));sq.setAttribute('data-tip',`${label} · ${mood}`);moodsInRange.add(mood);}if(key===todayKey)sq.classList.add('today');if(d>today)sq.style.opacity='0.08';grid.appendChild(sq);}
+    moodsInRange.forEach(mood=>{const item=document.createElement('div');item.className='legend-item';const dot=document.createElement('div');dot.className='legend-dot';dot.style.background=moodColor(mood);const lbl=document.createElement('span');lbl.textContent=mood;item.appendChild(dot);item.appendChild(lbl);legend.appendChild(item);});
+  }
+  function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+  const params=new URLSearchParams(window.location.search);
+  if(params.get('mood')){const pill=document.querySelector(`[data-mood="${params.get('mood')}"]`);if(pill)selectMood(pill);}
+  loadStats();
+</script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Journal — Cloud Café</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet"/>
+  <!-- style.css owns ALL color variables — edit colors there only -->
+  <link rel="stylesheet" href="/static/css/style.css"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh; background-color: var(--cream);
+      background-image: radial-gradient(ellipse at 15% 15%, var(--gradient-a) 0%, transparent 55%), radial-gradient(ellipse at 85% 85%, var(--gradient-b) 0%, transparent 55%);
+      font-family: 'Lora', serif; color: var(--ink);
+    }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; background: var(--paper); border-bottom: 2px dashed var(--brown-pale); box-shadow: 0 2px 12px var(--shadow); }
+    .back-btn { font-family: 'Caveat', cursive; font-size: 1.1rem; color: var(--brown); text-decoration: none; transition: color 0.2s; }
+    .back-btn:hover { color: var(--brown-light); }
+    .topbar-title { font-family: 'Caveat', cursive; font-size: 2rem; font-weight: 700; color: var(--brown); }
+    .topbar-right { display: flex; align-items: center; gap: 0.8rem; }
+    .coin-badge { font-family: 'Caveat', cursive; font-size: 0.95rem; color: var(--brown); background: var(--brown-pale); padding: 0.3rem 0.8rem; border-radius: 20px; text-decoration: none; transition: background 0.2s; }
+    .coin-badge:hover { background: var(--blush); }
+    .mood-link { font-family: 'Caveat', cursive; font-size: 1rem; background: var(--sage); color: var(--ink); padding: 0.45rem 1.1rem; border-radius: 20px; text-decoration: none; transition: background 0.2s, transform 0.1s; }
+    .mood-link:hover { background: var(--sage-dark); color: var(--cream); transform: translateY(-1px); }
+    .container { max-width: 860px; margin: 2rem auto; padding: 0 1.5rem; }
+    .tabs { display: flex; gap: 0.5rem; margin-bottom: -2px; position: relative; z-index: 1; }
+    .tab-btn { font-family: 'Caveat', cursive; font-size: 1.15rem; padding: 0.55rem 1.6rem; border: 2px solid var(--brown-pale); border-bottom: none; border-radius: 10px 10px 0 0; background: var(--brown-pale); color: var(--ink-light); cursor: pointer; transition: all 0.2s; }
+    .tab-btn.active { background: var(--paper); color: var(--brown); font-weight: 700; }
+    .tab-btn:hover:not(.active) { background: var(--blush); }
+    .panel { background: var(--paper); border: 2px solid var(--brown-pale); border-radius: 0 10px 10px 10px; padding: 2rem; box-shadow: 0 4px 24px var(--shadow); display: none; animation: fadeUp 0.3s ease; }
+    .panel.active { display: block; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .entry-meta { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 1rem; }
+    .entry-date { font-family: 'Caveat', cursive; font-size: 1.05rem; color: var(--ink-light); }
+    .mood-selector { display: flex; flex-direction: column; gap: 0.4rem; }
+    .mood-selector-label { font-family: 'Caveat', cursive; font-size: 0.95rem; color: var(--ink-light); }
+    .mood-pills { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .mood-pill { padding: 0.4rem 0.9rem; border-radius: 10px; border: 2px solid transparent; background: var(--cream); cursor: pointer; transition: all 0.15s; font-family: 'Caveat', cursive; font-size: 1rem; color: var(--ink-light); }
+    .mood-pill:hover { border-color: var(--brown-pale); transform: translateY(-2px); }
+    .mood-pill.selected { border-color: var(--brown); background: var(--blush); color: var(--brown); }
+    .paper-wrap { position: relative; margin: 1rem 0; }
+    .paper-lines { position: absolute; inset: 0; pointer-events: none; background-image: repeating-linear-gradient(transparent, transparent 31px, var(--brown-pale) 31px, var(--brown-pale) 32px); border-radius: 8px; }
+    .paper-margin { position: absolute; top: 0; bottom: 0; left: 48px; width: 1.5px; background: var(--blush); pointer-events: none; }
+    textarea { position: relative; z-index: 1; width: 100%; min-height: 300px; padding: 8px 1rem 1rem 60px; background: transparent; border: 2px solid var(--brown-pale); border-radius: 8px; font-family: 'Caveat', cursive; font-size: 1.18rem; line-height: 32px; color: var(--ink); resize: vertical; outline: none; transition: border-color 0.2s; }
+    textarea:focus { border-color: var(--brown); }
+    textarea::placeholder { color: var(--ink-light); font-style: italic; }
+    .save-row { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; }
+    .word-count { font-family: 'Caveat', cursive; font-size: 0.95rem; color: var(--ink-light); }
+    .save-btn { font-family: 'Caveat', cursive; font-size: 1.15rem; font-weight: 700; padding: 0.6rem 1.8rem; background: var(--brown); color: var(--cream); border: none; border-radius: 20px; cursor: pointer; transition: all 0.2s; box-shadow: 0 3px 10px var(--shadow); }
+    .save-btn:hover { background: var(--brown-light); transform: translateY(-2px); }
+    .save-btn:active { transform: translateY(0); }
+    .entries-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
+    .entries-heading { font-family: 'Caveat', cursive; font-size: 1.3rem; color: var(--brown); }
+    .entries-count { font-family: 'Caveat', cursive; font-size: 0.9rem; color: var(--ink-light); background: var(--brown-pale); padding: 0.2rem 0.7rem; border-radius: 20px; }
+    .entries-list { display: flex; flex-direction: column; gap: 1rem; }
+    .entry-card { background: var(--cream); border: 1.5px solid var(--brown-pale); border-radius: 10px; padding: 1.2rem 1.4rem; transition: box-shadow 0.2s, transform 0.2s; animation: fadeUp 0.3s ease; }
+    .entry-card:hover { box-shadow: 0 4px 16px var(--shadow); transform: translateY(-1px); }
+    .entry-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.7rem; }
+    .entry-card-date { font-family: 'Caveat', cursive; font-size: 0.9rem; color: var(--ink-light); }
+    .entry-mood-img { width: 28px; height: 28px; object-fit: contain; }
+    .entry-card-text { font-family: 'Lora', serif; font-size: 0.95rem; line-height: 1.75; color: var(--ink); white-space: pre-wrap; max-height: 100px; overflow: hidden; position: relative; }
+    .entry-card-text::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 36px; background: linear-gradient(transparent, var(--cream)); pointer-events: none; }
+    .entry-card-text.expanded { max-height: none; }
+    .entry-card-text.expanded::after { display: none; }
+    .entry-card-actions { display: flex; gap: 0.5rem; margin-top: 0.8rem; }
+    .expand-btn, .delete-btn { font-family: 'Caveat', cursive; font-size: 0.9rem; padding: 0.25rem 0.8rem; border-radius: 20px; border: 1.5px solid var(--brown-pale); cursor: pointer; background: transparent; transition: all 0.15s; color: var(--brown); }
+    .expand-btn:hover { background: var(--brown-pale); }
+    .delete-btn { color: var(--brown); border-color: var(--brown-pale); }
+    .delete-btn:hover { background: var(--blush); }
+    .empty-state { text-align: center; padding: 3rem 1rem; font-family: 'Caveat', cursive; font-size: 1.15rem; color: var(--ink-light); }
+    .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--brown); color: var(--cream); font-family: 'Caveat', cursive; font-size: 1.05rem; padding: 0.7rem 1.4rem; border-radius: 20px; box-shadow: 0 4px 16px var(--shadow); opacity: 0; transform: translateY(8px); transition: all 0.3s; pointer-events: none; z-index: 100; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="/" class="back-btn">← back to café</a>
+    <span class="topbar-title">☕ my journal</span>
+    <div class="topbar-right">
+      <a href="/closet" class="coin-badge" id="coin-badge">— coins</a>
+      <a href="/mood" class="mood-link">log a mood</a>
+    </div>
+  </div>
+  <div class="container">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('new')">new entry</button>
+      <button class="tab-btn" onclick="switchTab('previous')">previous entries</button>
+    </div>
+    <div class="panel active" id="panel-new">
+      <div class="entry-meta">
+        <span class="entry-date" id="current-date"></span>
+        <div class="mood-selector">
+          <span class="mood-selector-label">how are you feeling?</span>
+          <div class="mood-pills">
+            <button class="mood-pill" data-mood="happy"      onclick="selectMood(this)">happy</button>
+            <button class="mood-pill" data-mood="calm"       onclick="selectMood(this)">calm</button>
+            <button class="mood-pill" data-mood="content"    onclick="selectMood(this)">content</button>
+            <button class="mood-pill" data-mood="hopeful"    onclick="selectMood(this)">hopeful</button>
+            <button class="mood-pill" data-mood="anxious"    onclick="selectMood(this)">anxious</button>
+            <button class="mood-pill" data-mood="frustrated" onclick="selectMood(this)">frustrated</button>
+            <button class="mood-pill" data-mood="lonely"     onclick="selectMood(this)">lonely</button>
+            <button class="mood-pill" data-mood="sad"        onclick="selectMood(this)">sad</button>
+            <button class="mood-pill" data-mood="tired"      onclick="selectMood(this)">tired</button>
+          </div>
+        </div>
+      </div>
+      <div class="paper-wrap">
+        <div class="paper-lines"></div>
+        <div class="paper-margin"></div>
+        <textarea id="journal-input" placeholder="dear journal, today I..." oninput="updateWordCount()"></textarea>
+      </div>
+      <div class="save-row">
+        <span class="word-count" id="word-count">0 words</span>
+        <button class="save-btn" onclick="saveEntry()">save entry</button>
+      </div>
+    </div>
+    <div class="panel" id="panel-previous">
+      <div class="entries-header">
+        <span class="entries-heading">your entries</span>
+        <span class="entries-count" id="entries-count">—</span>
+      </div>
+      <div class="entries-list" id="entries-list"><div class="empty-state">loading...</div></div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+<script>
+  let selectedMood = null;
+  const moodImages = { happy:'/static/img/moods/mood-happy.png', calm:'/static/img/moods/mood-calm.png', content:'/static/img/moods/mood-content.png', hopeful:'/static/img/moods/mood-hopeful.png', anxious:'/static/img/moods/mood-anxious.png', frustrated:'/static/img/moods/mood-frustrated.png', lonely:'/static/img/moods/mood-lonely.png', sad:'/static/img/moods/mood-sad.png', tired:'/static/img/moods/mood-tired.png' };
+  function setDate() { const now = new Date(); document.getElementById('current-date').textContent = now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) + ' · ' + now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); }
+  setDate(); setInterval(setDate, 60000);
+  async function loadCoins() { try { const res = await fetch('/api/coins'); const data = await res.json(); document.getElementById('coin-badge').textContent = `${data.coins} coin${data.coins!==1?'s':''}`; } catch {} }
+  loadCoins();
+  function switchTab(tab) { document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active')); if(tab==='new'){document.querySelectorAll('.tab-btn')[0].classList.add('active');document.getElementById('panel-new').classList.add('active');}else{document.querySelectorAll('.tab-btn')[1].classList.add('active');document.getElementById('panel-previous').classList.add('active');loadEntries();} }
+  function selectMood(btn) { document.querySelectorAll('.mood-pill').forEach(p=>p.classList.remove('selected')); btn.classList.add('selected'); selectedMood = btn.dataset.mood; }
+  function updateWordCount() { const text = document.getElementById('journal-input').value.trim(); const words = text ? text.split(/\s+/).length : 0; document.getElementById('word-count').textContent = words + (words===1?' word':' words'); }
+  async function saveEntry() {
+    const entry = document.getElementById('journal-input').value.trim();
+    if (!entry) { showToast('write something first'); return; }
+    try {
+      const res = await fetch('/api/journal/save', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({entry, mood:selectedMood}) });
+      if (!res.ok) throw new Error();
+      if (selectedMood) await fetch('/api/mood/save', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({mood:selectedMood, note:'logged from journal'}) });
+      document.getElementById('journal-input').value = '';
+      document.querySelectorAll('.mood-pill').forEach(p=>p.classList.remove('selected'));
+      selectedMood = null; updateWordCount();
+      showToast('entry saved — coin earned'); loadCoins();
+    } catch { showToast('something went wrong, try again'); }
+  }
+  async function loadEntries() {
+    const list = document.getElementById('entries-list');
+    list.innerHTML = '<div class="empty-state">loading your entries...</div>';
+    try {
+      const res = await fetch('/api/journal/all'); const entries = await res.json(); const count = entries.length;
+      document.getElementById('entries-count').textContent = count + (count===1?' entry':' entries');
+      if (count===0) { list.innerHTML = '<div class="empty-state">no entries yet — write your first one</div>'; return; }
+      list.innerHTML = entries.map(e => {
+        const date = new Date(e.date);
+        const dateStr = date.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+        const timeStr = date.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+        const moodThumb = e.mood ? `<img class="entry-mood-img" src="${moodImages[e.mood]||''}" alt="${e.mood}" onerror="this.style.display='none'"/>` : '';
+        return `<div class="entry-card" id="card-${e.id}"><div class="entry-card-header"><span class="entry-card-date">${dateStr} · ${timeStr}</span>${moodThumb}</div><div class="entry-card-text" id="text-${e.id}">${escapeHtml(e.entry)}</div><div class="entry-card-actions"><button class="expand-btn" onclick="toggleExpand(${e.id})">read more</button><button class="delete-btn" onclick="deleteEntry(${e.id})">delete</button></div></div>`;
+      }).join('');
+    } catch { list.innerHTML = '<div class="empty-state">could not load entries</div>'; }
+  }
+  function toggleExpand(id) { const el = document.getElementById('text-'+id); const btn = el.nextElementSibling.querySelector('.expand-btn'); el.classList.toggle('expanded'); btn.textContent = el.classList.contains('expanded')?'show less':'read more'; }
+  async function deleteEntry(id) { if (!confirm('delete this entry?')) return; try { await fetch('/api/journal/delete/'+id,{method:'DELETE'}); document.getElementById('card-'+id).remove(); showToast('entry deleted'); const r = document.querySelectorAll('.entry-card').length; document.getElementById('entries-count').textContent = r+(r===1?' entry':' entries'); if(r===0)document.getElementById('entries-list').innerHTML='<div class="empty-state">no entries yet</div>'; } catch { showToast('could not delete'); } }
+  function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+  function escapeHtml(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('mood')) { const pill = document.querySelector(`[data-mood="${params.get('mood')}"]`); if (pill) selectMood(pill); }
+</script>
+</body>
+</html>
