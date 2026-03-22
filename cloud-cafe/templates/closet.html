@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Closet — Cloud Café</title>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet"/>
-  <!-- style.css owns ALL color variables — edit colors there only -->
   <link rel="stylesheet" href="/static/css/style.css"/>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -15,29 +14,76 @@
     .back-btn:hover { color: var(--brown-light); }
     .topbar-title { font-family: 'Caveat', cursive; font-size: 2rem; font-weight: 700; color: var(--brown); }
     .coin-balance { font-family: 'Caveat', cursive; font-size: 1.1rem; font-weight: 700; color: var(--brown); background: var(--blush); border: 2px solid var(--brown-pale); border-radius: 20px; padding: 0.35rem 1rem; }
+
     .layout { display: grid; grid-template-columns: 220px 1fr; gap: 1.5rem; max-width: 900px; margin: 2rem auto; padding: 0 1.5rem; }
+
     .cat-preview-card { background: var(--paper); border: 2px solid var(--brown-pale); border-radius: 14px; padding: 1.5rem; box-shadow: 0 2px 16px var(--shadow); display: flex; flex-direction: column; align-items: center; gap: 1rem; position: sticky; top: 1.5rem; align-self: start; }
     .preview-title { font-family: 'Caveat', cursive; font-size: 1.1rem; color: var(--brown); }
-    .preview-cat-wrap { position: relative; width: 130px; height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
-    .preview-cat-body { width: 88px; height: 108px; background: var(--brown-pale); border-radius: 50% 50% 42% 42%; position: relative; box-shadow: 0 4px 14px var(--shadow); }
-    .preview-cat-body::before, .preview-cat-body::after { content: ''; position: absolute; top: -17px; width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-bottom: 20px solid var(--brown-pale); }
-    .preview-cat-body::before { left: 10px; } .preview-cat-body::after { right: 10px; }
-    .cat-eye { position: absolute; top: 30px; width: 10px; height: 10px; background: var(--brown); border-radius: 50%; }
-    .cat-eye.l { left: 18px; } .cat-eye.r { right: 18px; }
-    .cat-nose { position: absolute; top: 48px; left: 50%; transform: translateX(-50%); width: 6px; height: 5px; background: var(--brown-light); border-radius: 50%; }
-    #preview-outfit-layers { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 88px; height: 108px; pointer-events: none; }
-    #preview-outfit-layers img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
-    .preview-equipped-list { font-family: 'Caveat', cursive; font-size: 0.85rem; color: var(--ink-light); text-align: center; line-height: 1.6; }
+    .preview-cat-wrap img { width: 150px; height: auto; display: block; }
+
+    .preview-equipped-list { font-family: 'Caveat', cursive; font-size: 0.9rem; color: var(--ink-light); text-align: center; line-height: 1.7; }
+    .equipped-tag { display: inline-block; background: var(--blush); color: var(--brown); border-radius: 20px; padding: 0.15rem 0.7rem; margin: 0.15rem; font-size: 0.85rem; }
     .earn-hint { font-family: 'Lora', serif; font-style: italic; font-size: 0.78rem; color: var(--ink-light); text-align: center; line-height: 1.5; padding: 0.6rem; background: var(--cream); border-radius: 8px; border: 1px solid var(--brown-pale); width: 100%; }
+
     .shop-panel { display: flex; flex-direction: column; gap: 1.2rem; }
     .section-title { font-family: 'Caveat', cursive; font-size: 1.2rem; color: var(--brown); margin-bottom: 0.8rem; display: block; }
     .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.8rem; }
-    .item-card { background: var(--paper); border: 2px solid var(--brown-pale); border-radius: 12px; padding: 1rem 0.8rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; transition: box-shadow 0.2s, transform 0.2s; }
+    .item-card { background: var(--paper); border: 2px solid var(--brown-pale); border-radius: 12px; padding: 1rem 0.8rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; transition: box-shadow 0.2s, transform 0.2s; cursor: pointer; }
     .item-card:hover { box-shadow: 0 4px 16px var(--shadow); transform: translateY(-2px); }
     .item-card.owned { border-color: var(--sage-dark); background: var(--cream); }
     .item-card.equipped { border-color: var(--brown); background: var(--blush); }
-    .item-art { width: 72px; height: 72px; border-radius: 8px; border: 1.5px dashed var(--brown-pale); background: var(--cream); object-fit: contain; }
-    .item-name { font-family: 'Caveat', cursive; font-size: 1rem; color: var(--brown); font-weight: 600; text-align: center; }
+    .item-art { width: 72px; height: 72px; border-radius: 8px; background: var(--cream); border: 1.5px dashed var(--brown-pale); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; flex-shrink: 0; }
+
+    /* item art CSS drawings */
+    .outfit-hat-beret { position: relative; width: 44px; height: 28px; }
+    .outfit-hat-beret .beret-brim { position: absolute; bottom: 0; left: 0; right: 0; height: 8px; background: #c0485a; border-radius: 3px; }
+    .outfit-hat-beret .beret-top  { position: absolute; bottom: 6px; left: 4px; right: -6px; height: 20px; background: #d4697a; border-radius: 50% 60% 20% 20%; transform: rotate(-8deg); }
+    .outfit-hat-tophat { position: relative; width: 38px; height: 46px; }
+    .outfit-hat-tophat .tophat-brim { position: absolute; bottom: 0; left: -4px; right: -4px; height: 8px; background: #4a1c28; border-radius: 3px; }
+    .outfit-hat-tophat .tophat-body { position: absolute; bottom: 6px; left: 6px; right: 6px; top: 0; background: #4a1c28; border-radius: 3px 3px 1px 1px; }
+    .outfit-hat-tophat .tophat-band { position: absolute; bottom: 14px; left: 6px; right: 6px; height: 6px; background: #c0485a; }
+    .outfit-hat-flowers { width: 56px; height: 28px; display: flex; align-items: flex-end; justify-content: center; gap: 3px; }
+    .outfit-hat-flowers .stem { width: 2px; height: 12px; background: #8abc7a; border-radius: 1px; }
+    .outfit-hat-flowers .bloom { width: 14px; height: 14px; background: #f9a8b4; border-radius: 50%; border: 2px solid #f5c6c6; position: relative; }
+    .outfit-hat-flowers .bloom::after { content: ''; position: absolute; inset: 3px; background: #fff0f0; border-radius: 50%; }
+    .outfit-hat-bow { width: 50px; height: 32px; display: flex; align-items: center; justify-content: center; position: relative; }
+    .outfit-hat-bow .bow-l { width: 18px; height: 14px; background: #f9a8b4; border-radius: 50% 0 50% 50%; transform: rotate(-20deg); border: 1.5px solid #d4697a; }
+    .outfit-hat-bow .bow-r { width: 18px; height: 14px; background: #f9a8b4; border-radius: 0 50% 50% 50%; transform: rotate(20deg); border: 1.5px solid #d4697a; margin-left: -6px; }
+    .outfit-hat-bow .bow-k { width: 8px; height: 8px; background: #d4697a; border-radius: 50%; position: absolute; }
+    .outfit-scarf-pink { position: relative; width: 52px; height: 38px; }
+    .outfit-scarf-pink .scarf-wrap { position: absolute; top: 0; left: 6px; right: 6px; height: 14px; background: #f9a8b4; border-radius: 8px; border: 1.5px solid #d4697a; }
+    .outfit-scarf-pink .scarf-tail { position: absolute; bottom: 0; right: 14px; width: 10px; height: 22px; background: #f9a8b4; border-radius: 4px; border: 1.5px solid #d4697a; }
+    .outfit-scarf-pink .scarf-stripe { position: absolute; top: 5px; left: 6px; right: 6px; height: 3px; background: #d4697a; border-radius: 2px; }
+    .outfit-collar-bow { width: 52px; height: 30px; display: flex; align-items: flex-start; justify-content: center; position: relative; flex-direction: column; }
+    .outfit-collar-bow .cband { width: 100%; height: 10px; background: #c0485a; border-radius: 5px; }
+    .outfit-collar-bow .cbow { display: flex; align-items: center; justify-content: center; position: relative; margin-top: 2px; }
+    .outfit-collar-bow .cbow-l { width: 14px; height: 10px; background: #f9a8b4; border-radius: 50% 0 50% 50%; transform: rotate(-20deg); border: 1px solid #d4697a; }
+    .outfit-collar-bow .cbow-r { width: 14px; height: 10px; background: #f9a8b4; border-radius: 0 50% 50% 50%; transform: rotate(20deg); border: 1px solid #d4697a; margin-left: -4px; }
+    .outfit-collar-bow .cbow-k { width: 6px; height: 6px; background: #d4697a; border-radius: 50%; position: absolute; }
+    .outfit-collar-star { width: 52px; height: 30px; display: flex; flex-direction: column; align-items: center; }
+    .outfit-collar-star .sband { width: 100%; height: 10px; background: #9b5060; border-radius: 5px; }
+    .outfit-collar-star .sstar { font-size: 18px; line-height: 1; margin-top: 2px; color: #f0c090; }
+    .outfit-apron { width: 52px; height: 60px; display: flex; flex-direction: column; align-items: center; position: relative; }
+    .outfit-apron .apron-strings { display: flex; justify-content: space-between; width: 46px; }
+    .outfit-apron .apron-str { width: 8px; height: 3px; background: #f5c6c6; border-radius: 1px; margin-top: 2px; }
+    .outfit-apron .apron-str.l { transform: rotate(-30deg); }
+    .outfit-apron .apron-str.r { transform: rotate(30deg); }
+    .outfit-apron .apron-bib { width: 28px; height: 18px; background: #fff8f8; border: 1.5px solid #f5c6c6; border-radius: 3px 3px 6px 6px; }
+    .outfit-apron .apron-skirt { width: 44px; height: 32px; background: #fff8f8; border: 1.5px solid #f5c6c6; border-radius: 3px 3px 10px 10px; margin-top: 2px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 5px; }
+    .outfit-apron .apron-pocket { width: 14px; height: 10px; border: 1.5px solid #f5c6c6; border-radius: 0 0 4px 4px; border-top: none; }
+    .outfit-raincoat { width: 52px; height: 60px; display: flex; flex-direction: column; align-items: center; }
+    .outfit-raincoat .rc-hood { width: 28px; height: 13px; background: #a8c4e8; border: 1.5px solid #7aa8d4; border-radius: 50% 50% 0 0; }
+    .outfit-raincoat .rc-body { width: 46px; height: 44px; background: #a8c4e8; border: 1.5px solid #7aa8d4; border-radius: 4px 4px 10px 10px; display: flex; flex-direction: column; align-items: center; padding-top: 6px; gap: 5px; position: relative; overflow: hidden; }
+    .outfit-raincoat .rc-body::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 10px; height: 100%; background: rgba(255,255,255,0.2); }
+    .outfit-raincoat .rc-btn { width: 5px; height: 5px; background: #7aa8d4; border-radius: 50%; }
+    .outfit-cardigan { width: 52px; height: 56px; display: flex; flex-direction: column; align-items: center; }
+    .outfit-cardigan .cardi-body { width: 46px; height: 48px; background: #e8d4c0; border: 1.5px solid #c8a888; border-radius: 4px 4px 10px 10px; display: flex; flex-direction: column; align-items: center; padding-top: 4px; gap: 5px; position: relative; overflow: hidden; }
+    .outfit-cardigan .cardi-body::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 8px; height: 100%; background: rgba(200,168,136,0.3); }
+    .outfit-cardigan .cardi-btn { width: 5px; height: 5px; background: #c8a888; border-radius: 50%; }
+    .outfit-cardigan .cflapl { width: 12px; height: 14px; background: #d4b898; border: 1px solid #c8a888; border-radius: 0 0 4px 0; position: absolute; top: 0; left: 0; }
+    .outfit-cardigan .cflapr { width: 12px; height: 14px; background: #d4b898; border: 1px solid #c8a888; border-radius: 0 0 0 4px; position: absolute; top: 0; right: 0; }
+
+    .item-name  { font-family: 'Caveat', cursive; font-size: 1rem; color: var(--brown); font-weight: 600; text-align: center; }
     .item-price { font-family: 'Caveat', cursive; font-size: 0.85rem; color: var(--ink-light); }
     .item-price.free { color: var(--sage-dark); font-weight: 700; }
     .item-btn { font-family: 'Caveat', cursive; font-size: 0.9rem; width: 100%; padding: 0.35rem 0; border-radius: 20px; border: 1.5px solid var(--brown-pale); background: transparent; color: var(--brown); cursor: pointer; transition: all 0.15s; }
@@ -51,124 +97,130 @@
   </style>
 </head>
 <body>
+
   <div class="topbar">
     <a href="/" class="back-btn">← back to café</a>
     <span class="topbar-title">☕ Mochi's closet</span>
     <span class="coin-balance" id="coin-balance">— coins</span>
   </div>
+
   <div class="layout">
+
     <div class="cat-preview-card">
       <span class="preview-title">Mochi today</span>
       <div class="preview-cat-wrap">
-        <div class="preview-cat-body">
-          <div class="cat-eye l"></div><div class="cat-eye r"></div><div class="cat-nose"></div>
-          <div id="preview-outfit-layers"></div>
-        </div>
+        <img src="/static/img/mochi.gif" alt="Mochi"/>
       </div>
       <p class="preview-equipped-list" id="equipped-list">nothing equipped yet</p>
       <div class="earn-hint">earn coins by journaling, logging moods, opening fortunes, and visiting daily</div>
     </div>
+
     <div class="shop-panel">
       <div><span class="section-title">hats</span><div class="items-grid" id="hats-grid"></div></div>
       <div><span class="section-title">scarves & collars</span><div class="items-grid" id="scarves-grid"></div></div>
       <div><span class="section-title">full outfits</span><div class="items-grid" id="outfits-grid"></div></div>
     </div>
+
   </div>
+
   <div class="toast" id="toast"></div>
-<script>
-  const ITEMS = [
-    { slug:'hat-beret',        name:'beret',        price:30, category:'hat' },
-    { slug:'hat-tophat',       name:'top hat',      price:50, category:'hat' },
-    { slug:'hat-flowers',      name:'flower crown', price:40, category:'hat' },
-    { slug:'hat-bow',          name:'bow',          price:20, category:'hat' },
-    { slug:'scarf-pink',       name:'pink scarf',   price:25, category:'scarf' },
-    { slug:'collar-bow',       name:'bow collar',   price:20, category:'scarf' },
-    { slug:'collar-star',      name:'star collar',  price:35, category:'scarf' },
-    { slug:'outfit-apron',     name:'café apron',   price:60, category:'outfit' },
-    { slug:'outfit-raincoat',  name:'raincoat',     price:80, category:'outfit' },
-    { slug:'outfit-cardigan',  name:'cardigan',     price:70, category:'outfit' },
-  ];
-  let coins = 0, wardrobe = {};
-  async function loadWardrobe() {
-    try {
-      const res = await fetch('/api/wardrobe'); const data = await res.json();
-      coins = data.coins; updateCoinDisplay();
-      wardrobe = {};
-      data.items.forEach(i => { wardrobe[i.slug] = { purchased:i.purchased, equipped:i.equipped }; });
-      renderShop(); renderPreview();
-    } catch { showToast('could not load wardrobe'); }
-  }
-  function renderShop() {
-    const hatsGrid=document.getElementById('hats-grid'), scarvesGrid=document.getElementById('scarves-grid'), outfitsGrid=document.getElementById('outfits-grid');
-    hatsGrid.innerHTML = scarvesGrid.innerHTML = outfitsGrid.innerHTML = '';
-    ITEMS.forEach(item => {
-      const state = wardrobe[item.slug] || { purchased:0, equipped:0 };
-      const card = document.createElement('div');
-      card.className = 'item-card' + (state.purchased ? (state.equipped ? ' equipped' : ' owned') : '');
-      card.id = `card-${item.slug}`;
-      card.addEventListener("mouseenter", () => {
-        showPreview(item.slug);
+
+  <script>
+    const ITEMS = [
+      { slug:'hat-beret',       name:'beret',        price:30, category:'hat'    },
+      { slug:'hat-tophat',      name:'top hat',      price:50, category:'hat'    },
+      { slug:'hat-flowers',     name:'flower crown', price:40, category:'hat'    },
+      { slug:'hat-bow',         name:'bow',          price:20, category:'hat'    },
+      { slug:'scarf-pink',      name:'pink scarf',   price:25, category:'scarf'  },
+      { slug:'collar-bow',      name:'bow collar',   price:20, category:'scarf'  },
+      { slug:'collar-star',     name:'star collar',  price:35, category:'scarf'  },
+      { slug:'outfit-apron',    name:'café apron',   price:60, category:'outfit' },
+      { slug:'outfit-raincoat', name:'raincoat',     price:80, category:'outfit' },
+      { slug:'outfit-cardigan', name:'cardigan',     price:70, category:'outfit' },
+    ];
+
+    let coins = 0, wardrobe = {};
+
+    async function loadWardrobe() {
+      try {
+        const res  = await fetch('/api/wardrobe');
+        const data = await res.json();
+        coins = data.coins; updateCoinDisplay();
+        wardrobe = {};
+        data.items.forEach(i => { wardrobe[i.slug] = { purchased: i.purchased, equipped: i.equipped }; });
+        renderShop(); renderPreview();
+      } catch { showToast('could not load wardrobe'); }
+    }
+
+    function makeItemArt(slug) {
+      const art = document.createElement('div'); art.className = 'item-art';
+      const h = (cls, children = []) => { const el = document.createElement('div'); el.className = cls; children.forEach(c => el.appendChild(c)); return el; };
+      if (slug === 'hat-beret') { art.appendChild(h('outfit-hat-beret', [h('beret-top'), h('beret-brim')])); }
+      else if (slug === 'hat-tophat') { art.appendChild(h('outfit-hat-tophat', [h('tophat-body'), h('tophat-band'), h('tophat-brim')])); }
+      else if (slug === 'hat-flowers') { const w = h('outfit-hat-flowers'); for(let i=0;i<3;i++){w.appendChild(h('stem'));w.appendChild(h('bloom'));} art.appendChild(w); }
+      else if (slug === 'hat-bow') { art.appendChild(h('outfit-hat-bow', [h('bow-l'), h('bow-r'), h('bow-k')])); }
+      else if (slug === 'scarf-pink') { art.appendChild(h('outfit-scarf-pink', [h('scarf-wrap'), h('scarf-stripe'), h('scarf-tail')])); }
+      else if (slug === 'collar-bow') { art.appendChild(h('outfit-collar-bow', [h('cband'), h('cbow', [h('cbow-l'), h('cbow-r'), h('cbow-k')])])); }
+      else if (slug === 'collar-star') { const s = h('sstar'); s.textContent='★'; art.appendChild(h('outfit-collar-star', [h('sband'), s])); }
+      else if (slug === 'outfit-apron') { const sk = h('apron-skirt', [h('apron-pocket')]); art.appendChild(h('outfit-apron', [h('apron-strings', [h('apron-str l'), h('apron-str r')]), h('apron-bib'), sk])); }
+      else if (slug === 'outfit-raincoat') { const b = h('rc-body', [h('rc-btn'),h('rc-btn'),h('rc-btn')]); art.appendChild(h('outfit-raincoat', [h('rc-hood'), b])); }
+      else if (slug === 'outfit-cardigan') { const b = h('cardi-body', [h('cflapl'),h('cflapr'),h('cardi-btn'),h('cardi-btn'),h('cardi-btn')]); art.appendChild(h('outfit-cardigan', [b])); }
+      return art;
+    }
+
+    function renderShop() {
+      const grids = { hat: document.getElementById('hats-grid'), scarf: document.getElementById('scarves-grid'), outfit: document.getElementById('outfits-grid') };
+      Object.values(grids).forEach(g => g.innerHTML = '');
+      ITEMS.forEach(item => {
+        const state = wardrobe[item.slug] || { purchased:0, equipped:0 };
+        const card = document.createElement('div');
+        card.className = 'item-card' + (state.purchased ? (state.equipped ? ' equipped' : ' owned') : '');
+        card.id = `card-${item.slug}`;
+        const name = document.createElement('span'); name.className='item-name'; name.textContent=item.name;
+        const price = document.createElement('span'); price.className=item.price===0?'item-price free':'item-price'; price.textContent=item.price===0?'free':`${item.price} coins`;
+        const btn = document.createElement('button'); btn.className='item-btn';
+        if (!state.purchased) { btn.textContent=`buy — ${item.price}`; btn.classList.add('buy'); if(coins<item.price)btn.disabled=true; btn.onclick=()=>buyItem(item.slug,item.price); }
+        else if (state.equipped) { btn.textContent='unequip'; btn.classList.add('equipped-btn'); btn.onclick=()=>equipItem(item.slug,false); }
+        else { btn.textContent='equip'; btn.onclick=()=>equipItem(item.slug,true); }
+        card.appendChild(makeItemArt(item.slug)); card.appendChild(name); card.appendChild(price); card.appendChild(btn);
+        grids[item.category].appendChild(card);
       });
-      card.addEventListener("mouseleave", () => {
-        removePreview(item.slug);
-      });
-      const artDiv = document.createElement('div'); artDiv.className = 'item-art';
-      const name = document.createElement('span'); name.className = 'item-name'; name.textContent = item.name;
-      const price = document.createElement('span'); price.className = item.price===0?'item-price free':'item-price'; price.textContent = item.price===0?'free':`${item.price} coins`;
-      const btn = document.createElement('button'); btn.className = 'item-btn';
-      if (!state.purchased) { btn.textContent=`buy — ${item.price}`; btn.classList.add('buy'); if(coins<item.price) btn.disabled=true; btn.onclick=()=>buyItem(item.slug,item.price); }
-      else if (state.equipped) { btn.textContent='unequip'; btn.classList.add('equipped-btn'); btn.onclick=()=>equipItem(item.slug,false); }
-      else { btn.textContent='equip'; btn.onclick=()=>equipItem(item.slug,true); }
-      card.appendChild(artDiv); card.appendChild(name); card.appendChild(price); card.appendChild(btn);
-      if (item.category==='hat') hatsGrid.appendChild(card);
-      else if (item.category==='scarf') scarvesGrid.appendChild(card);
-      else outfitsGrid.appendChild(card);
-    });
-  }
-  function renderPreview() {
-    const layerContainer = document.getElementById('preview-outfit-layers'), listEl=document.getElementById('equipped-list');
-    const equippedItems=ITEMS.filter(i=>wardrobe[i.slug]?.equipped);
-    layer.innerHTML='';
-    equippedItems.forEach(item => {
-        const layer = document.createElement('div');
-        layer.className = `mochi-layer ${item.slug}`;
-        layer.id = `layer-${item.slug}`;
-        layerContainer.appendChild(layer);
-    });
-    listEl.textContent = equippedItems.length>0 ? equippedItems.map(i=>i.name).join(', ') : 'nothing equipped yet';
-  }
-  async function buyItem(slug,price) {
-    try {
-      const res=await fetch('/api/wardrobe/buy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug,price})});
-      if(!res.ok){showToast('not enough coins');return;}
-      coins-=price; wardrobe[slug]={purchased:1,equipped:0}; updateCoinDisplay(); renderShop(); showToast(`${slug.replace(/-/g,' ')} purchased`);
-    } catch { showToast('could not buy item'); }
-  }
-  async function equipItem(slug,equipped) {
-    try {
-      await fetch('/api/wardrobe/equip',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug,equipped})});
-      if(!wardrobe[slug]) wardrobe[slug]={purchased:1,equipped:0};
-      wardrobe[slug].equipped=equipped?1:0; renderShop(); renderPreview(); showToast(equipped?'equipped':'unequipped');
-    } catch { showToast('could not update outfit'); }
-  }
-  function updateCoinDisplay() { document.getElementById('coin-balance').textContent=`${coins} coin${coins!==1?'s':''}`; }
-  function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
-  function showPreview(slug) {
-    const container = document.getElementById('preview-outfit-layers');
+    }
 
-    if (document.getElementById('preview-temp')) return;
+    function renderPreview() {
+      const listEl = document.getElementById('equipped-list');
+      const equipped = ITEMS.filter(i => wardrobe[i.slug]?.equipped);
+      if (equipped.length === 0) {
+        listEl.textContent = 'nothing equipped yet';
+      } else {
+        listEl.innerHTML = equipped.map(i => `<span class="equipped-tag">${i.name}</span>`).join(' ');
+      }
+    }
 
-    const layer = document.createElement('div');
-    layer.className = `mochi-layer ${slug} preview`;
-    layer.id = 'preview-temp';
+    async function buyItem(slug, price) {
+      try {
+        const res = await fetch('/api/wardrobe/buy', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({slug,price}) });
+        if (!res.ok) { showToast('not enough coins'); return; }
+        coins -= price; wardrobe[slug]={purchased:1,equipped:0};
+        updateCoinDisplay(); renderShop(); renderPreview();
+        showToast(`${slug.replace(/-/g,' ')} purchased ✓`);
+      } catch { showToast('could not buy item'); }
+    }
 
-    container.appendChild(layer);
-   }
-   function removePreview() {
-     const temp = document.getElementById('preview-temp');
-     if (temp) temp.remove();
-   }
-  loadWardrobe();
-</script>
+    async function equipItem(slug, equipped) {
+      try {
+        await fetch('/api/wardrobe/equip', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({slug,equipped}) });
+        if (!wardrobe[slug]) wardrobe[slug]={purchased:1,equipped:0};
+        wardrobe[slug].equipped = equipped?1:0;
+        renderShop(); renderPreview();
+        showToast(equipped?'equipped ✓':'unequipped');
+      } catch { showToast('could not update outfit'); }
+    }
+
+    function updateCoinDisplay() { document.getElementById('coin-balance').textContent=`${coins} coin${coins!==1?'s':''}`; }
+    function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+
+    loadWardrobe();
+  </script>
 </body>
 </html>

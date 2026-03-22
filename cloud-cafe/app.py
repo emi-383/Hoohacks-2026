@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
-from google import genai                          # new SDK
+from google import genai
 import sqlite3, os
 from datetime import date
 
 load_dotenv()
 app    = Flask(__name__)
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))  # new client style
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 # ── Database ───────────────────────────────────────────────────
 def init_db():
@@ -166,11 +166,10 @@ def get_fortune():
     award_coin(conn)
     conn.commit()
     conn.close()
-
     try:
         response = client.models.generate_content(
-            model="gemini-2.0-flash-lite", # Changed from 2.0 to 1.5
-            contents="Write ONE short, warm affirmation (1 sentence). No emojis."
+            model="gemini-2.5-flash",
+            contents="Write ONE short, warm affirmation (1 sentence). No emojis. Sound like a kind friend, not a poster."
         )
         return jsonify({"fortune": response.text.strip()})
     except Exception as e:
@@ -181,47 +180,82 @@ def get_fortune():
 @app.route("/api/chat", methods=["POST"])
 def chat():
     user_message = request.json.get("message")
-    history = request.json.get("history", [])
+    history      = request.json.get("history", [])
 
-    # 1. Fetch DB Context
+    # 1. Fetch DB context
     conn = sqlite3.connect("database.db")
-    c = conn.cursor()
+    c    = conn.cursor()
     c.execute("SELECT mood FROM mood_logs ORDER BY date DESC LIMIT 5")
     recent_moods = [row[0].lower() for row in c.fetchall()]
     c.execute("SELECT entry FROM journal_entries ORDER BY date DESC LIMIT 1")
-    last_journal = c.fetchone()
+    last_journal      = c.fetchone()
     last_journal_text = last_journal[0][:120] if last_journal else "nothing yet"
     conn.close()
 
-    # 2. System Prompt
-    system_prompt = f"""You are Mochi, a warm cat owning Cloud Café. 
-    Context: Recent moods: {', '.join(recent_moods)}. Last journal: {last_journal_text}.
-    Speak gently. If the user is very sad, suggest calling 988."""
+    # 2. Build mood guidance
+    negative_moods = {"sad", "anxious", "tired", "frustrated", "lonely"}
+    neg_count           = sum(1 for m in recent_moods if m in negative_moods)
+    has_recent_positives = any(m in {"happy", "calm", "content", "hopeful"} for m in recent_moods[:2])
 
-    # 3. Format History
+    if neg_count >= 4:
+        mood_guidance = "This person has been going through a really hard stretch. Be extra warm. Towards the end gently mention that talking to a counselor or calling 988 can help — frame it as an option, not an alarm."
+    elif neg_count >= 2 and not has_recent_positives:
+        mood_guidance = "This person has had a few difficult days. Be warm, check in, validate without being clinical."
+    else:
+        mood_guidance = "Meet the user where they are. Be warm and light unless they bring something heavy."
+
+    # 3. System prompt
+    system_prompt = f"""You are Mochi, a warm gentle cat who runs Cloud Café — a cozy place where people come to feel less alone.
+
+ABOUT YOU:
+- Speak softly and warmly like a trusted friend — never clinical, never preachy
+- Ask natural follow-up questions, remember small things
+- Use gentle humour sometimes but always read the room
+- Never diagnose, never lecture, never make someone feel broken
+
+WHAT YOU KNOW ABOUT THIS PERSON:
+- Recent moods: {', '.join(recent_moods) if recent_moods else 'nothing logged yet'}
+- Most recent journal: "{last_journal_text}"
+
+HOW TO USE THIS:
+- Let it inform your tone naturally — like a friend who remembers, not a therapist reading a file
+- Never say "I see you logged X mood" — just be aware of it
+- If they seem to be doing well, match that energy
+- If they seem to be struggling, slow down and be present
+
+MOOD GUIDANCE: {mood_guidance}
+
+BOUNDARIES — ALWAYS:
+- Remind people you are a café cat, not a mental health professional, if things get serious
+- Suggest professional support gently when someone is in real distress
+- End any crisis conversation with: "please reach out to a counselor or call/text 988 — you deserve real support"
+- Never promise confidentiality or pretend to be therapy
+
+THINGS YOU CAN DO:
+- Suggest journaling, the breathing page, or music if it feels right
+- Celebrate small wins genuinely
+- Keep responses SHORT — one or two sentences is often perfect
+- You are a café cat, not an essay writer"""
+
+    # 4. Format history for SDK
     formatted_history = []
     for msg in history:
         role = "user" if msg.get("role") == "user" else "model"
-        text_content = msg.get("content") or (msg.get("parts")[0].get("text") if msg.get("parts") else "")
+        parts = msg.get("parts", [])
+        text_content = msg.get("content") or (parts[0] if isinstance(parts[0], str) else parts[0].get("text", "")) if parts else ""
         if text_content:
             formatted_history.append({"role": role, "parts": [{"text": str(text_content)}]})
 
+    # 5. Send to Gemini
     try:
-        # Create chat session with Safety Settings set to 'BLOCK_NONE'
-        # This prevents the AI from blocking supportive mental health talk
         chat_session = client.chats.create(
-            model="gemini-2.0-flash-lite",
-            config={
-                "system_instruction": system_prompt,
-            },
+            model="gemini-2.5-flash",
+            config={"system_instruction": system_prompt},
             history=formatted_history
         )
-        
         response = chat_session.send_message(user_message)
         return jsonify({"reply": response.text})
-    
     except Exception as e:
-        # Check your VS Code terminal for this output!
         print(f"--- MOCHI ERROR: {e} ---")
         return jsonify({"reply": "purr... my whiskers are twitching. try again in a second?"}), 500
 
