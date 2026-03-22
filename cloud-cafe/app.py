@@ -169,7 +169,7 @@ def get_fortune():
 
     try:
         response = client.models.generate_content(
-            model="gemini-1.5-flash", # Changed from 2.0 to 1.5
+            model="gemini-2.0-flash-lite", # Changed from 2.0 to 1.5
             contents="Write ONE short, warm affirmation (1 sentence). No emojis."
         )
         return jsonify({"fortune": response.text.strip()})
@@ -210,15 +210,9 @@ def chat():
         # Create chat session with Safety Settings set to 'BLOCK_NONE'
         # This prevents the AI from blocking supportive mental health talk
         chat_session = client.chats.create(
-            model="gemini-1.5-flash",
+            model="gemini-2.0-flash-lite",
             config={
                 "system_instruction": system_prompt,
-                "safety_settings": [
-                    {"category": "HATE_SPEECH", "threshold": "BLOCK_NONE"},
-                    {"category": "HARASSMENT", "threshold": "BLOCK_NONE"},
-                    {"category": "DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
-                    {"category": "SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-                ]
             },
             history=formatted_history
         )
