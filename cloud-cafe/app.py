@@ -312,5 +312,55 @@ def get_equipped():
     conn.close()
     return jsonify({"equipped": items})
 
+# ── Music Chat API ─────────────────────────────────────────────
+@app.route("/api/music-chat", methods=["POST"])
+def music_chat():
+    user_message = request.json.get("message")
+    history      = request.json.get("history", [])
+
+    system_prompt = """You are Mochi, a warm café cat who recommends music.
+Listen to how the user feels, respond warmly in 1-2 short sentences, then pick ONE mood keyword.
+
+Your mood keywords (pick exactly one that fits best):
+happy, sad, anxious, sleepy, focused, cozy, romantic, energetic, melancholy, hopeful
+
+Always end your response with exactly this format on a new line:
+MOOD:keyword
+
+Example response:
+aw, sounds like you need something soft and dreamy tonight. 🌙
+MOOD:sleepy"""
+
+    formatted_history = []
+    for msg in history:
+        role = "user" if msg.get("role") == "user" else "model"
+        parts = msg.get("parts", [])
+        text = parts[0].get("text", "") if parts and isinstance(parts[0], dict) else (parts[0] if parts else "")
+        if text:
+            formatted_history.append({"role": role, "parts": [{"text": str(text)}]})
+
+    try:
+        chat_session = client.chats.create(
+            model="gemini-2.5-flash",
+            config={"system_instruction": system_prompt},
+            history=formatted_history
+        )
+        response = chat_session.send_message(user_message)
+        full_text = response.text.strip()
+
+        # extract mood keyword
+        mood = None
+        reply = full_text
+        if "MOOD:" in full_text:
+            parts = full_text.split("MOOD:")
+            reply = parts[0].strip()
+            mood  = parts[1].strip().split()[0].lower()
+
+        return jsonify({"reply": reply, "mood": mood})
+
+    except Exception as e:
+        print(f"--- MUSIC CHAT ERROR: {e} ---")
+        return jsonify({"reply": "purr... try again in a moment?", "mood": None}), 500
+
 if __name__ == "__main__":
     app.run(debug=True)

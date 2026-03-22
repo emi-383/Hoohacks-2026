@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cloud Café</title>
+  <title>Mellow Café</title>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="/static/css/style.css"/>
   <style>
@@ -284,7 +284,7 @@
 <body>
 
   <div id="loading-screen">
-    <span class="loading-title">☕ Cloud Café</span>
+    <span class="loading-title">☕ Mellow Café</span>
     <span class="loading-sub">brewing something warm for you...</span>
     <div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
   </div>
@@ -292,7 +292,7 @@
   <div id="cafe-scene">
 
     <div class="title-bar">
-      <span class="title-bar-name">☕ Cloud Café</span>
+      <span class="title-bar-name">☕ Mellow Café</span>
       <a href="/closet" class="coin-counter" id="coin-display">0 coins</a>
       <span class="title-bar-tag">a quiet place for you</span>
     </div>
@@ -385,7 +385,7 @@
 
     <div id="chat-panel">
       <div class="chat-header">
-        <div><div class="chat-header-name">Mochi</div><div class="chat-header-sub">Cloud Café host</div></div>
+        <div><div class="chat-header-name">Mochi</div><div class="chat-header-sub">Mellow Café host</div></div>
         <button class="chat-close" onclick="toggleChat()">close</button>
       </div>
       <div id="chat-window"></div>
@@ -461,7 +461,7 @@
         document.getElementById('cafe-scene').classList.add('visible');
         setTimeout(initCanvas, 900);
         setTimeout(() => {
-          const greetings = ["welcome to Cloud Café. i'm Mochi.", "glad you're here. the menu is on the wall.", "come in, take a seat. what's on your mind?"];
+          const greetings = ["welcome to Mellow Café. i'm Mochi.", "glad you're here. the menu is on the wall.", "come in, take a seat. what's on your mind?"];
           const msg = greetings[Math.floor(Math.random() * greetings.length)];
           document.getElementById('bubble-text').textContent = msg;
           document.getElementById('bubble-dot').classList.add('show');
