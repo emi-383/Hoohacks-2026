@@ -67,6 +67,45 @@
     .empty-state { text-align: center; padding: 2rem; font-family: 'Caveat', cursive; font-size: 1.1rem; color: var(--ink-light); }
     .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--brown); color: var(--cream); font-family: 'Caveat', cursive; font-size: 1.05rem; padding: 0.7rem 1.4rem; border-radius: 20px; box-shadow: 0 4px 16px var(--shadow); opacity: 0; transform: translateY(8px); transition: all 0.3s; pointer-events: none; z-index: 100; }
     .toast.show { opacity: 1; transform: translateY(0); }
+    /* ── CSS cat face for mood pills ── */
+.cat-face {
+  width: 36px; height: 36px; border-radius: 50%;
+  position: relative; background: #f5c6c6;
+  border: 1.5px solid #e8a0a8; flex-shrink: 0;
+}
+.cat-face::before, .cat-face::after {
+  content: ''; position: absolute; top: -7px; width: 0; height: 0;
+  border-left: 5px solid transparent; border-right: 5px solid transparent;
+  border-bottom: 9px solid #f5c6c6;
+}
+.cat-face::before { left: 4px; } .cat-face::after { right: 4px; }
+.cat-eye { position: absolute; top: 11px; width: 5px; height: 5px; background: #c0485a; border-radius: 50%; }
+.cat-eye.l { left: 7px; } .cat-eye.r { right: 7px; }
+.cat-nose { position: absolute; top: 19px; left: 50%; transform: translateX(-50%); width: 4px; height: 3px; background: #d4697a; border-radius: 50%; }
+.cat-mouth { position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 10px; height: 4px; border-bottom: 1.5px solid #d4697a; border-radius: 0 0 4px 4px; }
+.cat-brow { position: absolute; top: 7px; width: 8px; height: 2px; background: #c0485a; border-radius: 2px; }
+.cat-cheek { position: absolute; top: 16px; width: 7px; height: 4px; background: #f9a8b4; border-radius: 50%; opacity: 0.7; }
+.cat-tear { position: absolute; top: 18px; left: 7px; width: 3px; height: 5px; background: #a8c4e8; border-radius: 0 0 3px 3px; opacity: 0.8; }
+.cat-zzz { position: absolute; top: -4px; right: -6px; font-size: 8px; color: #9b5060; }
+
+/* mood-specific overrides */
+.cat-happy .cat-eye   { height: 3px; border-radius: 50% 50% 0 0; top: 13px; }
+.cat-happy .cat-mouth { width: 14px; height: 6px; border-bottom: 2px solid #c0485a; border-radius: 0 0 8px 8px; bottom: 5px; }
+.cat-calm .cat-eye    { height: 2px; top: 14px; border-radius: 2px; }
+.cat-calm .cat-mouth  { width: 8px; }
+.cat-hopeful .cat-eye { width: 6px; height: 6px; top: 10px; }
+.cat-anxious .cat-brow.bl { left: 5px; transform: rotate(15deg); }
+.cat-anxious .cat-brow.br { right: 5px; transform: rotate(-15deg); }
+.cat-anxious .cat-mouth   { border-bottom: none; border-top: 1.5px solid #d4697a; border-radius: 4px 4px 0 0; bottom: 5px; }
+.cat-frustrated .cat-brow.bl { left: 4px; transform: rotate(-10deg); }
+.cat-frustrated .cat-brow.br { right: 4px; transform: rotate(10deg); }
+.cat-frustrated .cat-mouth   { border-bottom: none; border-top: 1.5px solid #c0485a; border-radius: 0; width: 12px; bottom: 6px; }
+.cat-lonely .cat-eye  { top: 14px; height: 3px; border-radius: 50% 50% 0 0; }
+.cat-lonely .cat-mouth { border-bottom: none; border-top: 1.5px solid #d4697a; border-radius: 4px 4px 0 0; bottom: 5px; }
+.cat-sad .cat-eye   { top: 14px; height: 3px; border-radius: 50% 50% 0 0; }
+.cat-sad .cat-mouth { border-bottom: none; border-top: 2px solid #c0485a; border-radius: 4px 4px 0 0; bottom: 4px; width: 12px; }
+.cat-tired .cat-eye   { height: 2px; top: 15px; border-radius: 1px; opacity: 0.7; }
+.cat-tired .cat-mouth { border-radius: 0; }
   </style>
 </head>
 <body>
@@ -82,16 +121,74 @@
     <div class="card">
       <span class="card-title">how are you feeling right now?</span>
       <div class="mood-pills">
-        <button class="mood-pill" data-mood="happy"      onclick="selectMood(this)"><div class="pill-art"></div>happy</button>
-        <button class="mood-pill" data-mood="calm"       onclick="selectMood(this)"><div class="pill-art"></div>calm</button>
-        <button class="mood-pill" data-mood="content"    onclick="selectMood(this)"><div class="pill-art"></div>content</button>
-        <button class="mood-pill" data-mood="hopeful"    onclick="selectMood(this)"><div class="pill-art"></div>hopeful</button>
-        <button class="mood-pill" data-mood="anxious"    onclick="selectMood(this)"><div class="pill-art"></div>anxious</button>
-        <button class="mood-pill" data-mood="frustrated" onclick="selectMood(this)"><div class="pill-art"></div>frustrated</button>
-        <button class="mood-pill" data-mood="lonely"     onclick="selectMood(this)"><div class="pill-art"></div>lonely</button>
-        <button class="mood-pill" data-mood="sad"        onclick="selectMood(this)"><div class="pill-art"></div>sad</button>
-        <button class="mood-pill" data-mood="tired"      onclick="selectMood(this)"><div class="pill-art"></div>tired</button>
-      </div>
+        <button class="mood-pill" data-mood="happy" onclick="selectMood(this)">
+            <div class="cat-face cat-happy">
+            <div class="cat-eye l"></div><div class="cat-eye r"></div>
+            <div class="cat-nose"></div><div class="cat-mouth"></div>
+            </div>happy
+        </button>
+
+        <button class="mood-pill" data-mood="calm" onclick="selectMood(this)">
+            <div class="cat-face cat-calm">
+            <div class="cat-eye l"></div><div class="cat-eye r"></div>
+            <div class="cat-nose"></div><div class="cat-mouth"></div>
+            </div>calm
+        </button>
+
+        <button class="mood-pill" data-mood="content" onclick="selectMood(this)">
+            <div class="cat-face cat-content">
+            <div class="cat-eye l"></div><div class="cat-eye r"></div>
+            <div class="cat-nose"></div><div class="cat-mouth"></div>
+            </div>content
+        </button>
+
+        <button class="mood-pill" data-mood="hopeful" onclick="selectMood(this)">
+            <div class="cat-face cat-hopeful">
+            <div class="cat-eye l"></div><div class="cat-eye r"></div>
+            <div class="cat-nose"></div><div class="cat-mouth"></div>
+            <div class="cat-cheek cl"></div><div class="cat-cheek cr"></div>
+            </div>hopeful
+        </button>
+
+        <button class="mood-pill" data-mood="anxious" onclick="selectMood(this)">
+            <div class="cat-face cat-anxious">
+            <div class="cat-brow bl"></div><div class="cat-brow br"></div>
+            <div class="cat-eye l"></div><div class="cat-eye r"></div>
+            <div class="cat-nose"></div><div class="cat-mouth"></div>
+            </div>anxious
+        </button>
+
+        <button class="mood-pill" data-mood="frustrated" onclick="selectMood(this)">
+            <div class="cat-face cat-frustrated">
+            <div class="cat-brow bl"></div><div class="cat-brow br"></div>
+            <div class="cat-eye l"></div><div class="cat-eye r"></div>
+            <div class="cat-nose"></div><div class="cat-mouth"></div>
+            </div>frustrated
+        </button>
+
+        <button class="mood-pill" data-mood="lonely" onclick="selectMood(this)">
+            <div class="cat-face cat-lonely">
+            <div class="cat-eye l"></div><div class="cat-eye r"></div>
+            <div class="cat-nose"></div><div class="cat-mouth"></div>
+            </div>lonely
+        </button>
+
+        <button class="mood-pill" data-mood="sad" onclick="selectMood(this)">
+            <div class="cat-face cat-sad">
+            <div class="cat-eye l"></div><div class="cat-eye r"></div>
+            <div class="cat-nose"></div><div class="cat-mouth"></div>
+            <div class="cat-tear"></div>
+            </div>sad
+        </button>
+
+        <button class="mood-pill" data-mood="tired" onclick="selectMood(this)">
+            <div class="cat-face cat-tired">
+            <div class="cat-eye l"></div><div class="cat-eye r"></div>
+            <div class="cat-nose"></div><div class="cat-mouth"></div>
+            <div class="cat-zzz">z z</div>
+            </div>tired
+        </button>
+    </div>
       <div class="free-mood-row">
         <input type="text" class="free-mood-input" id="free-mood-input" placeholder="or type your own..." oninput="onFreeType()" maxlength="30"/>
         <button class="free-mood-btn" onclick="confirmFreeMood()">use this</button>

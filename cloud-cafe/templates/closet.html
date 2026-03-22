@@ -106,6 +106,12 @@
       const card = document.createElement('div');
       card.className = 'item-card' + (state.purchased ? (state.equipped ? ' equipped' : ' owned') : '');
       card.id = `card-${item.slug}`;
+      card.addEventListener("mouseenter", () => {
+        showPreview(item.slug);
+      });
+      card.addEventListener("mouseleave", () => {
+        removePreview(item.slug);
+      });
       const artDiv = document.createElement('div'); artDiv.className = 'item-art';
       const name = document.createElement('span'); name.className = 'item-name'; name.textContent = item.name;
       const price = document.createElement('span'); price.className = item.price===0?'item-price free':'item-price'; price.textContent = item.price===0?'free':`${item.price} coins`;
@@ -120,10 +126,15 @@
     });
   }
   function renderPreview() {
-    const layer=document.getElementById('preview-outfit-layers'), listEl=document.getElementById('equipped-list');
+    const layerContainer = document.getElementById('preview-outfit-layers'), listEl=document.getElementById('equipped-list');
     const equippedItems=ITEMS.filter(i=>wardrobe[i.slug]?.equipped);
     layer.innerHTML='';
-    equippedItems.forEach(item => { const img=document.createElement('img'); img.src=`/static/img/outfits/outfit-${item.slug}.png`; img.alt=item.name; img.onerror=()=>img.style.display='none'; layer.appendChild(img); });
+    equippedItems.forEach(item => {
+        const layer = document.createElement('div');
+        layer.className = `mochi-layer ${item.slug}`;
+        layer.id = `layer-${item.slug}`;
+        layerContainer.appendChild(layer);
+    });
     listEl.textContent = equippedItems.length>0 ? equippedItems.map(i=>i.name).join(', ') : 'nothing equipped yet';
   }
   async function buyItem(slug,price) {
@@ -142,6 +153,21 @@
   }
   function updateCoinDisplay() { document.getElementById('coin-balance').textContent=`${coins} coin${coins!==1?'s':''}`; }
   function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+  function showPreview(slug) {
+    const container = document.getElementById('preview-outfit-layers');
+
+    if (document.getElementById('preview-temp')) return;
+
+    const layer = document.createElement('div');
+    layer.className = `mochi-layer ${slug} preview`;
+    layer.id = 'preview-temp';
+
+    container.appendChild(layer);
+   }
+   function removePreview() {
+     const temp = document.getElementById('preview-temp');
+     if (temp) temp.remove();
+   }
   loadWardrobe();
 </script>
 </body>

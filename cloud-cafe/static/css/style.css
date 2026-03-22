@@ -182,6 +182,131 @@ a, button {
   height: 90%;
 }
 
+/* ============================================================
+   🎨 MOCHI CLOSET SYSTEM (drawn items + layering)
+   ============================================================ */
+
+/* container already exists (#preview-outfit-layers)
+   we just enhance it */
+#preview-outfit-layers {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 88px;
+  height: 108px;
+  pointer-events: none;
+}
+
+/* all items */
+.mochi-layer {
+  position: absolute;
+  pointer-events: none;
+  animation: popIn 0.25s ease;
+}
+
+/* ✨ animation when equipped */
+@keyframes popIn {
+  0%   { transform: scale(0.6) translateY(-8px); opacity: 0; }
+  70%  { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* 👀 preview state */
+.preview {
+  opacity: 0.5;
+  transform: scale(1.05);
+}
+
+/* ───────── DRAWN ITEMS ───────── */
+
+/* 🎨 BERET */
+.hat-beret {
+  top: -10px;
+  left: 18px;
+  width: 50px;
+  height: 22px;
+  background: var(--brown);
+  border-radius: 50%;
+}
+.hat-beret::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 18px;
+  width: 8px;
+  height: 8px;
+  background: var(--brown);
+  border-radius: 50%;
+}
+
+/* 🎩 TOP HAT */
+.hat-tophat {
+  top: -18px;
+  left: 22px;
+  width: 38px;
+  height: 40px;
+  background: #2b2b2b;
+  border-radius: 6px;
+}
+.hat-tophat::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: -10px;
+  width: 58px;
+  height: 10px;
+  background: #2b2b2b;
+  border-radius: 10px;
+}
+
+/* 🧣 SCARF */
+.scarf-pink {
+  top: 55px;
+  left: 12px;
+  width: 64px;
+  height: 18px;
+  background: var(--blush);
+  border-radius: 20px;
+}
+.scarf-pink::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 14px;
+  width: 12px;
+  height: 26px;
+  background: var(--blush);
+  border-radius: 10px;
+}
+
+/* ☕ APRON */
+.outfit-apron {
+  top: 52px;
+  left: 10px;
+  width: 68px;
+  height: 58px;
+  background: white;
+  border-radius: 10px;
+  border: 2px solid var(--brown-pale);
+}
+.outfit-apron::before {
+  content: "";
+  position: absolute;
+  top: -16px;
+  left: 14px;
+  width: 40px;
+  height: 18px;
+  border: 2px solid var(--brown-pale);
+  border-bottom: none;
+  border-radius: 20px 20px 0 0;
+}
+
+/* subtle handmade feel */
+.mochi-layer {
+  filter: drop-shadow(0 2px 0 rgba(0,0,0,0.08));
+}
+
 /* ── Invisible hotspot buttons ─────────────────────────────────
    Placed over drawn menu items once background art is in.
    Adjust % positions to match your partner's illustration.
@@ -254,4 +379,16 @@ a, button {
 @keyframes typingBounce {
   0%, 80%, 100% { transform: translateY(0);   opacity: 0.4; }
   40%            { transform: translateY(-6px); opacity: 1; }
+}
+
+.embed-wrap {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px var(--shadow);
+  animation: floaty 6s ease-in-out infinite;
+}
+
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }
