@@ -372,22 +372,13 @@
       <button class="clear-btn" onclick="clearCanvas()">clear</button>
     </div>
 
-    <!-- counter drawing -->
-    <img class="counter-layer" src="/static/img/counter.png" alt="counter"/>
-
-    <!-- cat (Mochi) — head peeks above counter -->
     <div class="cat-area">
-      <div class="cat-wrap" onclick="toggleChat()">
-        <div class="cat-body">
-          <div class="cat-eye l"></div><div class="cat-eye r"></div><div class="cat-nose"></div>
-          <div id="outfit-layers"></div>
+        <div class="cat-wrap" onclick="toggleChat()">
+            <img src="/static/img/mochi.gif" class="mochi-gif" alt="Mochi"/>
+            <div id="outfit-layers"></div>
         </div>
-      </div>
-      <span class="cat-label">Mochi</span>
+        <span class="cat-label">Mochi</span>
     </div>
-    <!-- when cat art is ready:
-    <img id="cat-img" src="/static/img/cat-idle.png" alt="Mochi" onclick="toggleChat()"
-         style="position:absolute;bottom:0;left:5%;height:35%;cursor:pointer;z-index:16;transition:transform 0.2s;"/> -->
 
     <!-- chat bubble -->
     <div id="chat-bubble" onclick="toggleChat()">

@@ -392,3 +392,16 @@ a, button {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
 }
+
+.mochi-gif {
+  width: 275px;
+  margin-left: -40px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 4px 10px var(--shadow));
+  transition: transform 0.2s;
+}
+
+.cat-wrap:hover .mochi-gif {
+  transform: translateY(-5px);
+}
