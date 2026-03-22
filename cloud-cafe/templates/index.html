@@ -238,11 +238,12 @@
     .menu-placeholder {
         position: absolute;
         top: 2%;
-        right: 2%;              /* 👈 keeps it on right side */
-        width: 42%;
+        left: auto;     /* optional, just to be clear */
+        right: 0;       /* keeps right edge in place */
+        width: 50%;     /* now it grows leftward — fine */
         height: 72%;
 
-        background: url('/static/img/menu side.png') no-repeat center;
+        background: url('/static/img/menu large.png') no-repeat center;
         background-size: contain;
 
         border: none;           /* remove box look */
@@ -251,24 +252,31 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 2rem 1.5rem;
+        padding: 3rem 2.5rem 2rem 2rem;
         z-index: 10;
     }
     .menu-title { font-family:'Caveat',cursive; font-size:1.4rem; font-weight:700; color:var(--brown); margin-bottom:0.8rem; flex-shrink:0; }
 
-    /* 2-column grid — items sit side by side */
     .menu-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        width: 100%;
         position: relative;
-        z-index: 11; /* 👈 above background */
+        z-index: 11;
     }
 
     /* dividers not needed in grid layout */
     .menu-divider { display: none; }
 
     .menu-item {
-        background: transparent;
-        border: none;
-        box-shadow: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        gap: 0.2rem;          
+        padding: 0.6rem 0.3rem;
     }
     .menu-item:hover {
         transform: scale(1.08);
@@ -281,18 +289,32 @@
       Procreate: 200x200px · transparent bg · PNG
     */
     .menu-item-art {
-        width: 64px;
+        width: 34px;
         height: 64px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 2rem;
-        border-radius: 10px;
-        background: var(--paper);
+        line-height: 1;
         margin-bottom: 0.4rem;
     }
-    .menu-item-name { font-family:'Caveat',cursive; font-size:1.1rem; color:var(--brown); font-weight:600; }
-    .menu-item-desc { font-family:'Lora',serif; font-size:0.7rem; color:var(--ink-light); font-style:italic; text-align:center; }
+    .menu-item-name {
+        font-family: 'Caveat', cursive;
+        font-size: 1rem;      /* slightly smaller */
+        color: var(--brown);
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .menu-item-desc {
+        font-family: 'Lora', serif;
+        font-size: 0.65rem;   /* 👈 smaller to prevent overlap */
+        color: var(--ink-light);
+        font-style: italic;
+        text-align: center;
+
+        line-height: 1.1;     /* 👈 prevents stacking overlap */
+    }
 
     /* coin toast */
     .coin-toast { position:fixed; bottom:2rem; right:2rem; background:var(--brown); color:var(--cream); font-family:'Caveat',cursive; font-size:1.05rem; padding:0.7rem 1.4rem; border-radius:20px; box-shadow:0 4px 16px var(--shadow); opacity:0; transform:translateY(8px); transition:all 0.3s; pointer-events:none; z-index:100; }
@@ -415,7 +437,6 @@
          with <img class="menu-item-art" src="/static/img/menu/menu-latte.png"/>
     ─────────────────────────────────────────────────────────── -->
     <div class="menu-placeholder">
-      <span class="menu-title">menu</span>
       <div class="menu-grid">
         <a href="/journal"   class="menu-item"><div class="menu-item-art">📓</div><span class="menu-item-name">journal</span><span class="menu-item-desc">write it out</span></a>
         <a href="/mood"      class="menu-item"><div class="menu-item-art">😊</div><span class="menu-item-name">mood</span><span class="menu-item-desc">track how you feel</span></a>
