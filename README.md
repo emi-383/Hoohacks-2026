@@ -10,3 +10,5 @@ Mellow Cafe features multiple interactive guided tools including a journal, mood
 The daily check in system to accumulate in platform currency encourages users to continue visiting Mellow Cafe and promote long term connection with mental health topics instead of one-time survey and record-keeping approaches.
 
 Mellow Cafe is a free and personal platform to help every one to take a postive step for themselves!
+
+[Watch the Demo](https://www.youtube.com/watch?v=Iux65qaqIFQ)
