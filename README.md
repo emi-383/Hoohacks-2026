@@ -1,6 +1,6 @@
 This is our hackathon program!
 
-Welcome to Mellow Cafe! A cute, interactive lowkey menthal health spot for anyone! With so  much stress in our day to day lives, our
+Welcome to Mellow Cafe! A cute, interactive lowkey mental health spot for anyone! With so  much stress in our day to day lives, our
 proper mental health care is even more valuable! However a huge stigma or anxiety of approaching doctors still remains, making it hard for people to seek the help they need.
 
 With Mellow Cafe small steps can be taken to a mindful and reflective care for ones mental health, with Mochi the cafe owner to help!
